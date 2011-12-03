@@ -44,9 +44,9 @@ draw n = do
                 (HsLit (HsInt 1))
 
 
-    let res = constructInfixApp nullVertex3 nullVertex3 t1
-
-
+    let (ConstructObj dif dim obj) = constructInfixApp nullVertex3 nullVertex3 t1
+    putStrLn . show $ dif
+    putStrLn . show $ obj
 
     putStrLn " Ok." 
     

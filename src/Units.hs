@@ -15,7 +15,7 @@ vertex3 x y z = GL.Vertex3 x y z
 
 nullVertex3 = vertex3 0 0 0
 
-diff = vertex3
+diff      = vertex3
 dimension = vertex3
 
 addX (GL.Vertex3 x y z, dir) xDiff = (GL.Vertex3 (x+xDiff)  y         z,        dir)

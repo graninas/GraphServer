@@ -1,8 +1,10 @@
 module Structure.GraphObject where
 
-data GraphObject = GraphObject
+import Structure.PrimitiveObject
+import Units
 
-variableBox l h w = undefined
-functionBox l h w = undefined
+data GraphObject = GO PrimitiveObject
+    deriving (Show)
 
-construction xs = undefined
+variableBox _ l h w = GO . PrimitiveBox $ (vertex3 l h w)
+functionBox _ l h w = GO . PrimitiveBox $ (vertex3 l h w)
