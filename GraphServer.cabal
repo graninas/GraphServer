@@ -1,0 +1,12 @@
+name:           GraphServer
+version:        0.1
+cabal-version:  >= 1.2
+build-type:     Simple
+
+executable GraphServer
+  hs-source-dirs:  src
+  main-is:         GraphServer.hs
+  build-depends:   base >= 4, network, bytestring, OpenGL, GLUT, OpenGLRaw, GLURaw
+  ghc-options:     -O1 -package GLUT -lglut
+  other-modules:   Draw.Draw
+

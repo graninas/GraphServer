@@ -1,0 +1,4 @@
+rm GraphServer
+ghc -package GLUT -lglut GraphServer.hs -o GraphServer -threaded
+chmod +x GraphServer
+./GraphServer
