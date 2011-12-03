@@ -60,4 +60,3 @@ constructInfixApp adiff adim (HsInfixApp l op r) =
   in  ConstructObj adiff (dimension (ll + opl + rl) 2 2) [lObj, opObj, rObj]
 
 
-W
