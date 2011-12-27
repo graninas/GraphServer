@@ -6,21 +6,29 @@ type GLfVertex2 = GL.Vertex2 GL.GLfloat
 type GLfVertex3 = GL.Vertex3 GL.GLfloat
 type GLfVector2 = GL.Vector2 GL.GLfloat
 type GLfVector3 = GL.Vector3 GL.GLfloat
+type GLfColor3  = GL.Color3  GL.GLfloat
 type GLfColor4  = GL.Color4  GL.GLfloat
 
 max3 a b c = max a (max b c)
 
 vertex3 :: GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GLfVertex3
-vertex3 x y z = GL.Vertex3 x y z
+vertex3 = GL.Vertex3
+vector3 :: GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GLfVector3
+vector3 = GL.Vector3
+color3 ::  GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GLfColor3
+color3 = GL.Color3
+color4 ::  GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GLfColor4
+color4 = GL.Color4
 
 nullVertex3 = vertex3 0 0 0
+nullVector3 = vector3 0 0 0
 
-diff      = vertex3
-dimension = vertex3
+diff      = vector3
+dimension = vector3
 
-addX (GL.Vertex3 x y z, dir) xDiff = (GL.Vertex3 (x+xDiff)  y         z,        dir)
-addZ (GL.Vertex3 x y z, dir) yDiff = (GL.Vertex3  x        (y+yDiff)  z,        dir)
-addY (GL.Vertex3 x y z, dir) zDiff = (GL.Vertex3  x         y        (z+zDiff), dir) 
+addX (GL.Vector3 x y z, dir) xDiff = (GL.Vector3 (x+xDiff)  y         z,        dir)
+addZ (GL.Vector3 x y z, dir) yDiff = (GL.Vector3  x        (y+yDiff)  z,        dir)
+addY (GL.Vector3 x y z, dir) zDiff = (GL.Vector3  x         y        (z+zDiff), dir) 
 
 addXs pos [] = pos
 addXs pos (xDiff:xs) = addXs (addX pos xDiff) xs

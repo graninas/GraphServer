@@ -3,8 +3,9 @@ module Draw.Draw where
 import qualified Graphics.Rendering.OpenGL as GL
 
 import Language.Haskell.Syntax
-import Structure.GraphStructure
+import Structure.StructureObject
 import Draw.Colors
+import Draw.Render
 import Units
 
 testData = do
@@ -33,21 +34,25 @@ draw n = do
     putStr $ "Current n = " ++ show n
     GL.clear [GL.ColorBuffer, GL.DepthBuffer]
     GL.loadIdentity
-    GL.rotate 10 (GL.Vector3 (0.0::GL.GLfloat) 1.0 0.0)
-    GL.rotate 15 (GL.Vector3 (1.0::GL.GLfloat) 0.0 0.0)
-    GL.translate (GL.Vector3 (1.0::GL.GLfloat) (-5.0) (-20.0))
-    GL.renderPrimitive GL.TriangleStrip $ testData
+    GL.rotate 10 (vector3 0 1 0)
+    GL.rotate 15 (vector3 1 0 0)
+    GL.translate (vector3 1 (-5) (-20))
+--    GL.renderPrimitive GL.TriangleStrip $ testData
 
     let t1 = HsInfixApp
                 (HsVar (UnQual (HsIdent "n")))
                 (HsQVarOp (UnQual (HsSymbol "-")))
                 (HsLit (HsInt 1))
 
+    let c@(ConstructObj dif dim obj) = constructInfixApp nullVector3 nullVector3 t1
 
-    let (ConstructObj dif dim obj) = constructInfixApp nullVertex3 nullVertex3 t1
+    render c
+
+
+
+
     putStrLn . show $ dif
     putStrLn . show $ obj
-
     putStrLn " Ok." 
     
     
