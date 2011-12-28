@@ -9,14 +9,14 @@ import Units
 
 data StructureObject = 
     StructObj
-        { 
-          trans       :: Translation
+        {
+          trans       :: Translation        
         , dimms       :: Dimensions
         , graphObject :: GraphObject
         }
     | Construction
         {
-          trans   :: Translation
+          trans       :: Translation
         , dimms   :: Dimensions
         , objects :: [StructureObject]   
         }
@@ -57,7 +57,7 @@ constructInfixApp (HsInfixApp l op r) =
      rc @(StructObj _ (GL.Vector3 rl  _ _) _) = constructExpr r
      lObj  = lc {trans = translation 0 0 0}
      opObj = opc{trans = translation ll 0 0}
-     rObj  = rc {trans = translation opl 0 0}
+     rObj  = rc {trans = translation (ll + opl) 0 0}
   in  Construction nullVector3 (dimension (ll + opl + rl) 2 2) [lObj, opObj, rObj]
 
 

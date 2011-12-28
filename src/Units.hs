@@ -28,16 +28,7 @@ nullVector3 = vector3 0 0 0
 translation = vector3
 dimension   = vector3
 
-addX (GL.Vector3 x y z, dir) xTrans = (GL.Vector3 (x+xTrans)  y          z,         dir)
-addZ (GL.Vector3 x y z, dir) yTrans = (GL.Vector3  x         (y+yTrans)  z,         dir)
-addY (GL.Vector3 x y z, dir) zTrans = (GL.Vector3  x          y         (z+zTrans), dir) 
-
-addXs pos [] = pos
-addXs pos (xTrans:xs) = addXs (addX pos xTrans) xs
-addYs pos [] = pos
-addYs pos (yTrans:ys) = addYs (addY pos yTrans) ys
-addZs pos [] = pos
-addZs pos (zTrans:zs) = addZs (addZ pos zTrans) zs
+negateVector3 (GL.Vector3 x y z) = GL.Vector3 (-x) (-y) (-z)
 
 unit :: GL.GLfloat -> GL.GLfloat
 unit n = (1.0 * n)
