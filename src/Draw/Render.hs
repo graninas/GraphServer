@@ -9,13 +9,13 @@ import Units
 
 
 
-render (StructObj dif dim go) = do
+render (StructObj dif _ go) = do
     let (po, compiled) = compileGraphObject $ go
     GL.translate dif
     GL.renderPrimitive po compiled 
 
 
-render (ConstructObj _ _ []) = return ()
-render (ConstructObj dif dim os) = do
+render (Construction _ _ []) = return ()
+render (Construction dif _ os) = do
     GL.translate dif
     mapM_ render os

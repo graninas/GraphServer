@@ -44,15 +44,13 @@ draw n = do
                 (HsQVarOp (UnQual (HsSymbol "-")))
                 (HsLit (HsInt 1))
 
-    let c@(ConstructObj dif dim obj) = constructInfixApp nullVector3 nullVector3 t1
+    let c = constructInfixApp t1
 
     render c
 
 
 
 
-    putStrLn . show $ dif
-    putStrLn . show $ obj
     putStrLn " Ok." 
     
     

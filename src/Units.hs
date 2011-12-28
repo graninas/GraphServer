@@ -8,6 +8,8 @@ type GLfVector2 = GL.Vector2 GL.GLfloat
 type GLfVector3 = GL.Vector3 GL.GLfloat
 type GLfColor3  = GL.Color3  GL.GLfloat
 type GLfColor4  = GL.Color4  GL.GLfloat
+type Translation = GLfVector3
+type Dimensions  = GLfVector3
 
 max3 a b c = max a (max b c)
 
@@ -23,19 +25,19 @@ color4 = GL.Color4
 nullVertex3 = vertex3 0 0 0
 nullVector3 = vector3 0 0 0
 
-diff      = vector3
-dimension = vector3
+translation = vector3
+dimension   = vector3
 
-addX (GL.Vector3 x y z, dir) xDiff = (GL.Vector3 (x+xDiff)  y         z,        dir)
-addZ (GL.Vector3 x y z, dir) yDiff = (GL.Vector3  x        (y+yDiff)  z,        dir)
-addY (GL.Vector3 x y z, dir) zDiff = (GL.Vector3  x         y        (z+zDiff), dir) 
+addX (GL.Vector3 x y z, dir) xTrans = (GL.Vector3 (x+xTrans)  y          z,         dir)
+addZ (GL.Vector3 x y z, dir) yTrans = (GL.Vector3  x         (y+yTrans)  z,         dir)
+addY (GL.Vector3 x y z, dir) zTrans = (GL.Vector3  x          y         (z+zTrans), dir) 
 
 addXs pos [] = pos
-addXs pos (xDiff:xs) = addXs (addX pos xDiff) xs
+addXs pos (xTrans:xs) = addXs (addX pos xTrans) xs
 addYs pos [] = pos
-addYs pos (yDiff:ys) = addYs (addY pos yDiff) ys
+addYs pos (yTrans:ys) = addYs (addY pos yTrans) ys
 addZs pos [] = pos
-addZs pos (zDiff:zs) = addZs (addZ pos zDiff) zs
+addZs pos (zTrans:zs) = addZs (addZ pos zTrans) zs
 
 unit :: GL.GLfloat -> GL.GLfloat
 unit n = (1.0 * n)
