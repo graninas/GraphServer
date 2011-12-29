@@ -47,9 +47,6 @@ constructOp (HsQVarOp opDef) =
                    (dimension boxLength 1 2)
                    (functionBox n boxLength  1 2)
 
-
-
-
 constructInfixApp (HsInfixApp l op r) =
   let
      lc @(StructObj _ (GL.Vector3 ll  _ _) _) = constructExpr l
@@ -61,3 +58,11 @@ constructInfixApp (HsInfixApp l op r) =
   in  Construction nullVector3 (dimension (ll + opl + rl) 2 2) [lObj, opObj, rObj]
 
 
+{- HsApp
+                (HsVar (UnQual (HsIdent "fact'")))
+                (HsParen
+                    (HsInfixApp
+                        (HsVar (UnQual (HsIdent "n")))
+                        (HsQVarOp (UnQual (HsSymbol "-")))
+                        (HsLit (HsInt 1))))
+                        -}

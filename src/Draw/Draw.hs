@@ -43,6 +43,14 @@ draw n = do
                 (HsVar (UnQual (HsIdent "n")))
                 (HsQVarOp (UnQual (HsSymbol "-")))
                 (HsLit (HsInt 1))
+    let t2 = HsApp
+                (HsVar (UnQual (HsIdent "fact'")))
+                (HsParen
+                    (HsInfixApp
+                        (HsVar (UnQual (HsIdent "n")))
+                        (HsQVarOp (UnQual (HsSymbol "-")))
+                        (HsLit (HsInt 1))))
+
 
     let c = constructInfixApp t1
 
