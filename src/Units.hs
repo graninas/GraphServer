@@ -22,6 +22,8 @@ color3 = GL.Color3
 color4 ::  GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GLfColor4
 color4 = GL.Color4
 
+texCoord2 x y =  GL.texCoord $ GL.TexCoord2 (x :: GL.GLfloat) (y :: GL.GLfloat)
+
 nullVertex3 = vertex3 0 0 0
 nullVector3 = vector3 0 0 0
 

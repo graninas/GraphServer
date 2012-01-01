@@ -8,5 +8,4 @@ executable GraphServer
   main-is:         GraphServer.hs
   build-depends:   base >= 4, network, bytestring, OpenGL, GLUT, OpenGLRaw, GLURaw
   ghc-options:     -O1 -package GLUT -lglut
-  other-modules:   Draw.Draw
 

@@ -3,23 +3,22 @@ module Main where
 import Network.Socket hiding (recv)
 import Network.Socket.ByteString
 import qualified Data.ByteString.Char8 as B
-
 import qualified Control.Concurrent.MVar as M (tryTakeMVar, tryPutMVar, newEmptyMVar, MVar) 
 import qualified Control.Concurrent as C
-import Data.Maybe (isJust)
-import Control.Monad (when, unless)
-
-import Graphics.UI.GLUT
+import qualified System.Time as T
+import qualified Graphics.UI.GLUT as GLUT
 
 import Draw.Tools
 import Draw.Draw
+import Draw.Texture
+import GLTypes
 
-import qualified System.Time as T 
 
 main::IO ()
 main = do
     mVar <- M.newEmptyMVar
   
+-- Socket Network Server
 --    putStrLn "Starting server..."
 --    sock <- socket AF_INET Stream defaultProtocol
 --    bindSocket sock (SockAddrInet 4343 0)
@@ -28,15 +27,18 @@ main = do
 
     startTime <- T.getClockTime
 
-    getArgsAndInitialize
-    wnd <- createWindow "Graph output"
+-- GL initializing
+    GLUT.getArgsAndInitialize
+    wnd <- GLUT.createWindow "Graph output"
     initGL
-    displayCallback $= (drawSceneCallback mVar draw)
-    reshapeCallback $= Just resizeSceneCallback
-    
+    texs <- textures
+    GLUT.displayCallback GLUT.$= (drawSceneCallback mVar (GLResources texs) draw)
+    GLUT.reshapeCallback GLUT.$= Just resizeSceneCallback
+
+-- Thread which sends postRedisplayMessage (to redraw GL window) with some frequency.
     fpsThread <- C.forkOS $ fpsLoop 0 mVar (Just wnd) (T.TimeDiff 0 0 0 0 0 0 50000000000) startTime
-    
-    mainLoop
+
+    GLUT.mainLoop
 
 --    C.killThread socketServerThread
 --    C.killThread fpsThread
