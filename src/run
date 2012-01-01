@@ -1,4 +1,4 @@
-rm GraphServer
-ghc -package GLUT -lglut GraphServer.hs -o GraphServer -threaded
-chmod +x GraphServer
-./GraphServer
+rm ../.buildDir/GraphServer
+ghc -package GLUT -lglut GraphServer.hs -o ../.buildDir/GraphServer -threaded -odir ../.buildDir -hidir ../.buildDir
+chmod +x ../.buildDir/GraphServer
+../.buildDir/GraphServer

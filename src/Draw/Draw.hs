@@ -10,35 +10,24 @@ import Draw.Texture
 import Units
 import GLTypes
 
-testData (GLResources ((texName, texObject):texs)) = do
+data TestData = TestData GLfColor4 GLfTexCoord2 GLfVertex3
+
+testData1 :: [TestData]
+testData1 = [
+    TestData (color4 1 0 0 0) (texCoord2 0 1) (vertex3 0 3 0),
+    TestData (color4 0 1 0 0) (texCoord2 0 0) (vertex3 0 0 0),
+    TestData (color4 0 0 1 0) (texCoord2 1 0) (vertex3 3 0 0),
+    TestData (color4 1 1 0 0) (texCoord2 1 1) (vertex3 3 3 0)
+    ]
+
+drawVertex (TestData col tCoord vert) = do
+    GL.color    col
+    GL.texCoord tCoord
+    GL.vertex   vert
+
+testData (GLResources ((texName, texObject):_)) = do
     GL.textureBinding GL.Texture2D GL.$= Just texObject
-    --GL.color (colors !! 0)
-    texCoord2 0 1
-    GL.vertex $ vertex3 0 0 0
-    --GL.color (colors !! 1)
-    texCoord2 0 0
-    GL.vertex $ vertex3 1 1 1
-    --GL.color (colors !! 2)
-    texCoord2 1 0
-    GL.vertex $ vertex3 (-1) (-1) (-1)
-    --GL.color (colors !! 3)
-    texCoord2 1 1
-    GL.vertex $ vertex3 0 1 0
-    --GL.color (colors !! 4)
-    texCoord2 0 1
-    GL.vertex $ vertex3 1 0 1
-    --GL.color (colors !! 5)
-    texCoord2 0 0
-    GL.vertex $ vertex3 (-1) 1 (-1)
-    --GL.color (colors !! 6)
-    texCoord2 1 0
-    GL.vertex $ vertex3 1 0 (-1)
-    --GL.color (colors !! 7)
-    texCoord2 1 1
-    GL.vertex $ vertex3 0 (-1) 1
-    --GL.color (colors !! 8)
-    texCoord2 0 1
-    GL.vertex $ vertex3 1 1 0
+    mapM_ drawVertex testData1
 
 
 draw :: DrawFunction
@@ -49,7 +38,7 @@ draw ress n = do
     GL.rotate 10 (vector3 0 1 0)
     GL.rotate 15 (vector3 1 0 0)
     GL.translate (vector3 1 (-5) (-20))
-    GL.renderPrimitive GL.TriangleStrip $ (testData ress)
+    GL.renderPrimitive GL.Quads $ (testData ress)
 
     let t1 = HsInfixApp
                 (HsVar (UnQual (HsIdent "n")))

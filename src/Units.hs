@@ -1,15 +1,7 @@
 module Units where
 
 import qualified Graphics.Rendering.OpenGL as GL
-
-type GLfVertex2 = GL.Vertex2 GL.GLfloat
-type GLfVertex3 = GL.Vertex3 GL.GLfloat
-type GLfVector2 = GL.Vector2 GL.GLfloat
-type GLfVector3 = GL.Vector3 GL.GLfloat
-type GLfColor3  = GL.Color3  GL.GLfloat
-type GLfColor4  = GL.Color4  GL.GLfloat
-type Translation = GLfVector3
-type Dimensions  = GLfVector3
+import GLTypes
 
 max3 a b c = max a (max b c)
 
@@ -21,8 +13,8 @@ color3 ::  GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GLfColor3
 color3 = GL.Color3
 color4 ::  GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GLfColor4
 color4 = GL.Color4
-
-texCoord2 x y =  GL.texCoord $ GL.TexCoord2 (x :: GL.GLfloat) (y :: GL.GLfloat)
+texCoord2 :: GL.GLfloat -> GL.GLfloat -> GLfTexCoord2
+texCoord2 =  GL.TexCoord2
 
 nullVertex3 = vertex3 0 0 0
 nullVector3 = vector3 0 0 0
