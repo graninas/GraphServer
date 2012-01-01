@@ -7,7 +7,7 @@ texturesPath    = "./Textures"
 
 
 tex1 = "Crate.tga"
-tex2 = "Crate.tga"
+tex2 = "Crate2.tga"
 
 rawTextureData :: RawTextures
 rawTextureData = [(tex1, texturesPath ++ "/" ++ tex1),

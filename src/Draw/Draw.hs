@@ -16,16 +16,16 @@ type ObjSpec = [(TextureName, GL.PrimitiveMode, [VertexSpec])]
 
 testData = [
     (tex1, GL.Quads,
-        [VertexSpec (color4 1 0 0 0) (texCoord2 0 1) (vertex3 0 3 0),
-         VertexSpec (color4 0 1 0 0) (texCoord2 0 0) (vertex3 0 0 0),
-         VertexSpec (color4 0 0 1 0) (texCoord2 1 0) (vertex3 3 0 0),
-         VertexSpec (color4 1 1 0 0) (texCoord2 1 1) (vertex3 3 3 0)]),
+        [VertexSpec colorWhite (texCoord2 0 1) (vertex3 0 3 0),
+         VertexSpec colorWhite (texCoord2 0 0) (vertex3 0 0 0),
+         VertexSpec colorWhite (texCoord2 1 0) (vertex3 3 0 0),
+         VertexSpec colorWhite (texCoord2 1 1) (vertex3 3 3 0)]),
     
     (tex2, GL.Quads,
-        [VertexSpec (color4 1 0 0 0) (texCoord2 0 1) (vertex3 3 6 0),
-         VertexSpec (color4 0 1 0 0) (texCoord2 0 0) (vertex3 3 3 0),
-         VertexSpec (color4 0 0 1 0) (texCoord2 1 0) (vertex3 6 3 0),
-         VertexSpec (color4 1 1 0 0) (texCoord2 1 1) (vertex3 6 6 0)])
+        [VertexSpec colorWhite (texCoord2 0 1) (vertex3 3 6 0),
+         VertexSpec colorWhite (texCoord2 0 0) (vertex3 3 3 0),
+         VertexSpec colorWhite (texCoord2 1 0) (vertex3 6 3 0),
+         VertexSpec colorWhite (texCoord2 1 1) (vertex3 6 6 0)])
     ]
 
 drawVertex (VertexSpec col tCoord vert) = do
@@ -40,14 +40,14 @@ drawVertexes texts (textureName, mode, vertexes) = do
 test (GLResources texRes) = mapM_ (drawVertexes texRes) testData
 
 draw :: DrawFunction
-draw ress n = do
+draw ress@(GLResources texRes) n = do
     putStr $ "Current n = " ++ show n
     GL.clear [GL.ColorBuffer, GL.DepthBuffer]
     GL.loadIdentity
     GL.rotate 10 (vector3 0 1 0)
     GL.rotate 15 (vector3 1 0 0)
     GL.translate (vector3 1 (-5) (-20))
-    test ress
+    --test ress
 
     let t1 = HsInfixApp
                 (HsVar (UnQual (HsIdent "n")))
@@ -64,7 +64,7 @@ draw ress n = do
 
     let c = constructInfixApp t1
 
-    --render c
+    render texRes c
     putStrLn " Ok." 
     
     

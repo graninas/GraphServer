@@ -22,6 +22,14 @@ nullVector3 = vector3 0 0 0
 translation = vector3
 dimension   = vector3
 
+colorWhite :: GLfColor4
+colorWhite = color4 1 1 1 1
+
+texCoordUR = texCoord2 1 0
+texCoordDR = texCoord2 0 0
+texCoordDL = texCoord2 0 1
+texCoordUL = texCoord2 1 1
+
 negateVector3 (GL.Vector3 x y z) = GL.Vector3 (-x) (-y) (-z)
 
 unit :: GL.GLfloat -> GL.GLfloat

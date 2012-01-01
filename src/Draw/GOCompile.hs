@@ -5,39 +5,40 @@ import Structure.PrimitiveObject
 import qualified Graphics.Rendering.OpenGL as GL
 import Common.Units
 
-compilePrimitiveObject (PrimitiveBox (GL.Vertex3 x y z)) = 
+compilePrimitiveObject texRes (PrimitiveBox (GL.Vertex3 x y z)) texName = 
     (GL.Quads, do
-        GL.color (color3 1 0 1)
-        GL.vertex (vertex3 x y z)
-        GL.vertex (vertex3 0 y z)
-        GL.vertex (vertex3 0 0 z)
-        GL.vertex (vertex3 x 0 z)
-        GL.color (color3 0 1 1)
-        GL.vertex (vertex3 x y z)
-        GL.vertex (vertex3 x y 0)
-        GL.vertex (vertex3 x 0 0)
-        GL.vertex (vertex3 x 0 z)
-        GL.color (color3 0 0 1)
-        GL.vertex (vertex3 x y z)
-        GL.vertex (vertex3 x y 0)
-        GL.vertex (vertex3 0 y 0)
-        GL.vertex (vertex3 0 y z)
-        GL.color (color3 1 0 0)
-        GL.vertex (vertex3 0 0 0)
-        GL.vertex (vertex3 0 y 0)
-        GL.vertex (vertex3 x y 0)
-        GL.vertex (vertex3 x 0 0)
-        GL.color (color3 1 1 0)
-        GL.vertex (vertex3 0 0 0)
-        GL.vertex (vertex3 0 0 z)
-        GL.vertex (vertex3 0 y z)
-        GL.vertex (vertex3 0 y 0)
-        GL.color (color3 1 0 0)
-        GL.vertex (vertex3 0 0 0)
-        GL.vertex (vertex3 x 0 0)
-        GL.vertex (vertex3 x 0 z)
-        GL.vertex (vertex3 0 0 z)
+        GL.textureBinding GL.Texture2D GL.$= lookup texName texRes
+        GL.color colorWhite
+        GL.texCoord texCoordUR >> GL.vertex (vertex3 x y z)
+        GL.texCoord texCoordDR >> GL.vertex (vertex3 0 y z)
+        GL.texCoord texCoordDL >> GL.vertex (vertex3 0 0 z)
+        GL.texCoord texCoordUL >> GL.vertex (vertex3 x 0 z)
+        
+        GL.texCoord texCoordUR >> GL.vertex (vertex3 x y z)
+        GL.texCoord texCoordDR >> GL.vertex (vertex3 x y 0)
+        GL.texCoord texCoordDL >> GL.vertex (vertex3 x 0 0)
+        GL.texCoord texCoordUL >> GL.vertex (vertex3 x 0 z)
+        
+        GL.texCoord texCoordUR >> GL.vertex (vertex3 x y z)
+        GL.texCoord texCoordDR >> GL.vertex (vertex3 x y 0)
+        GL.texCoord texCoordDL >> GL.vertex (vertex3 0 y 0)
+        GL.texCoord texCoordUL >> GL.vertex (vertex3 0 y z)
+        
+        GL.texCoord texCoordUR >> GL.vertex (vertex3 0 0 0)
+        GL.texCoord texCoordDR >> GL.vertex (vertex3 0 y 0)
+        GL.texCoord texCoordDL >> GL.vertex (vertex3 x y 0)
+        GL.texCoord texCoordUL >> GL.vertex (vertex3 x 0 0)
+        
+        GL.texCoord texCoordUR >> GL.vertex (vertex3 0 0 0)
+        GL.texCoord texCoordDR >> GL.vertex (vertex3 0 0 z)
+        GL.texCoord texCoordDL >> GL.vertex (vertex3 0 y z)
+        GL.texCoord texCoordUL >> GL.vertex (vertex3 0 y 0)
+        
+        GL.texCoord texCoordUR >> GL.vertex (vertex3 0 0 0)
+        GL.texCoord texCoordDR >> GL.vertex (vertex3 x 0 0)
+        GL.texCoord texCoordDL >> GL.vertex (vertex3 x 0 z)
+        GL.texCoord texCoordUL >> GL.vertex (vertex3 0 0 z)
     )
 
-compileGraphObject (GO primitiveObj) = compilePrimitiveObject primitiveObj
+compileGraphObject texRes (GO primitiveObj texName) = compilePrimitiveObject texRes primitiveObj texName
 
