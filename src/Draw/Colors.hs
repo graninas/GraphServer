@@ -1,8 +1,8 @@
 module Draw.Colors where
 
 import Graphics.Rendering.OpenGL
-import Units
-import GLTypes
+import Common.Units
+import Common.GLTypes
 
 colors :: [GLfColor4]
 colors = [Color4 0 0.5 1 0,

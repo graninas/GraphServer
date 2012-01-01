@@ -8,10 +8,10 @@ import qualified Control.Concurrent as C
 import qualified System.Time as T
 import qualified Graphics.UI.GLUT as GLUT
 
-import Draw.Tools
+import Common.GLInit
 import Draw.Draw
 import Draw.Texture
-import GLTypes
+import Common.GLTypes
 
 
 main::IO ()

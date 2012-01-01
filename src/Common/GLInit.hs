@@ -1,4 +1,4 @@
-module Draw.Tools where
+module Common.GLInit where
 
 import Graphics.Rendering.OpenGL
 import qualified Graphics.Rendering.OpenGL.Raw as GLRaw
@@ -9,7 +9,7 @@ import Network.Socket.ByteString
 import qualified Data.ByteString.Char8 as B
 import qualified Control.Concurrent.MVar as M (tryTakeMVar, tryPutMVar, newEmptyMVar, MVar) 
 
-import GLTypes
+import Common.GLTypes
 
 
 initGL :: IO ()

@@ -14,9 +14,9 @@ readImage :: Get (Int, Int, BS.ByteString)
 readImage = do skip 2
                isColor <- (==2) <$> getWord8
                skip 9
-               width <- fromIntegral <$> getWord16le
+               width  <- fromIntegral <$> getWord16le
                height <- fromIntegral <$> getWord16le
-               bpp <- fromIntegral <$> getWord8
+               bpp    <- fromIntegral <$> getWord8
                skip 1
                let bytesPerPixel = if isColor then 3 else 1
                pixels <- getByteString (width*height*bytesPerPixel)

@@ -7,28 +7,37 @@ import Structure.StructureObject
 import Draw.Colors
 import Draw.Render
 import Draw.Texture
-import Units
-import GLTypes
+import Common.Units
+import Common.GLTypes
+import Common.Constants
 
-data TestData = TestData GLfColor4 GLfTexCoord2 GLfVertex3
+data VertexSpec = VertexSpec GLfColor4 GLfTexCoord2 GLfVertex3
+type ObjSpec = [(TextureName, GL.PrimitiveMode, [VertexSpec])]
 
-testData1 :: [TestData]
-testData1 = [
-    TestData (color4 1 0 0 0) (texCoord2 0 1) (vertex3 0 3 0),
-    TestData (color4 0 1 0 0) (texCoord2 0 0) (vertex3 0 0 0),
-    TestData (color4 0 0 1 0) (texCoord2 1 0) (vertex3 3 0 0),
-    TestData (color4 1 1 0 0) (texCoord2 1 1) (vertex3 3 3 0)
+testData = [
+    (tex1, GL.Quads,
+        [VertexSpec (color4 1 0 0 0) (texCoord2 0 1) (vertex3 0 3 0),
+         VertexSpec (color4 0 1 0 0) (texCoord2 0 0) (vertex3 0 0 0),
+         VertexSpec (color4 0 0 1 0) (texCoord2 1 0) (vertex3 3 0 0),
+         VertexSpec (color4 1 1 0 0) (texCoord2 1 1) (vertex3 3 3 0)]),
+    
+    (tex2, GL.Quads,
+        [VertexSpec (color4 1 0 0 0) (texCoord2 0 1) (vertex3 3 6 0),
+         VertexSpec (color4 0 1 0 0) (texCoord2 0 0) (vertex3 3 3 0),
+         VertexSpec (color4 0 0 1 0) (texCoord2 1 0) (vertex3 6 3 0),
+         VertexSpec (color4 1 1 0 0) (texCoord2 1 1) (vertex3 6 6 0)])
     ]
 
-drawVertex (TestData col tCoord vert) = do
+drawVertex (VertexSpec col tCoord vert) = do
     GL.color    col
     GL.texCoord tCoord
     GL.vertex   vert
 
-testData (GLResources ((texName, texObject):_)) = do
-    GL.textureBinding GL.Texture2D GL.$= Just texObject
-    mapM_ drawVertex testData1
+drawVertexes texts (textureName, mode, vertexes) = do
+      GL.textureBinding GL.Texture2D GL.$= lookup textureName texts
+      GL.renderPrimitive mode $ (mapM_ drawVertex vertexes)
 
+test (GLResources texRes) = mapM_ (drawVertexes texRes) testData
 
 draw :: DrawFunction
 draw ress n = do
@@ -38,7 +47,7 @@ draw ress n = do
     GL.rotate 10 (vector3 0 1 0)
     GL.rotate 15 (vector3 1 0 0)
     GL.translate (vector3 1 (-5) (-20))
-    GL.renderPrimitive GL.Quads $ (testData ress)
+    test ress
 
     let t1 = HsInfixApp
                 (HsVar (UnQual (HsIdent "n")))

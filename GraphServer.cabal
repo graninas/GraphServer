@@ -6,6 +6,18 @@ build-type:     Simple
 executable GraphServer
   hs-source-dirs:  src
   main-is:         GraphServer.hs
-  build-depends:   base >= 4, network, bytestring, OpenGL, GLUT, OpenGLRaw, GLURaw
+  build-depends:   
+                   base >= 4,
+                   network,
+                   bytestring,
+                   OpenGL,
+                   GLUT,
+                   OpenGLRaw,
+                   GLURaw,
+                   vector,
+                   array,
+                   haskell-src,
+                   ghc-binary,
+                   old-time
   ghc-options:     -O1 -package GLUT -lglut
 

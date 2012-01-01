@@ -3,7 +3,7 @@ module Draw.GOCompile where
 import Structure.GraphObject
 import Structure.PrimitiveObject
 import qualified Graphics.Rendering.OpenGL as GL
-import Units
+import Common.Units
 
 compilePrimitiveObject (PrimitiveBox (GL.Vertex3 x y z)) = 
     (GL.Quads, do

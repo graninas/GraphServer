@@ -1,4 +1,4 @@
-module GLTypes where
+module Common.GLTypes where
 
 import qualified Graphics.Rendering.OpenGL as GL
 

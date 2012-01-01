@@ -1,7 +1,7 @@
-module Units where
+module Common.Units where
 
 import qualified Graphics.Rendering.OpenGL as GL
-import GLTypes
+import Common.GLTypes
 
 max3 a b c = max a (max b c)
 

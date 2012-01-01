@@ -5,8 +5,8 @@ import Language.Haskell.Syntax
 
 import Structure.HsSyntaxTools
 import Structure.GraphObject
-import Units
-import GLTypes
+import Common.Units
+import Common.GLTypes
 
 data StructureObject = 
     StructObj

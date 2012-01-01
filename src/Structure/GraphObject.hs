@@ -1,7 +1,7 @@
 module Structure.GraphObject where
 
 import Structure.PrimitiveObject
-import Units
+import Common.Units
 
 data GraphObject = GO PrimitiveObject
     deriving (Show)

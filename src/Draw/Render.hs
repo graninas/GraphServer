@@ -4,7 +4,7 @@ import qualified Graphics.Rendering.OpenGL as GL
 
 import Structure.StructureObject
 import Draw.GOCompile
-import Units
+import Common.Units
 
 
 

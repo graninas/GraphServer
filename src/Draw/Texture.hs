@@ -4,8 +4,8 @@ import Graphics.Rendering.OpenGL
 import ThirdParty.ImageFormats.TGA
 import ThirdParty.GLUtil.Textures
 
-import GLTypes
-import Constants
+import Common.GLTypes
+import Common.Constants
 
 makeTextureData :: RawTexture -> IO PreparedTextureObject
 makeTextureData (textureName, fileName) = 
