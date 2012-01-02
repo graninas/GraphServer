@@ -12,6 +12,10 @@ type GLfTexCoord2 = GL.TexCoord2 GL.GLfloat
 type Translation = GLfVector3
 type Dimensions  = GLfVector3
 
+
+data DerivedDimensions = NoDeriving
+                       | FuncDims (GLfVector3 -> GLfVector3)
+
 type TextureName = String
 type RawTexture  = (TextureName, FilePath)
 type RawTextures = [RawTexture]

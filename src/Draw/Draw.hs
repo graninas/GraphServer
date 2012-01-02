@@ -55,16 +55,13 @@ draw ress@(GLResources texRes) n = do
                 (HsLit (HsInt 1))
     let t2 = HsApp
                 (HsVar (UnQual (HsIdent "fact'")))
-                (HsParen
-                    (HsInfixApp
-                        (HsVar (UnQual (HsIdent "n")))
-                        (HsQVarOp (UnQual (HsSymbol "-")))
-                        (HsLit (HsInt 1))))
+                (HsParen t1)
 
 
-    let c = constructInfixApp t1
+    let c1 = constructExpr t1 NoDeriving
+    let c2 = constructExpr t2 NoDeriving
 
-    render texRes c
+    render texRes c2
     putStrLn " Ok." 
     
     
