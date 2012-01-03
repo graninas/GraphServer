@@ -9,16 +9,10 @@ import Common.GLTypes
 
 
 
-
-render texRes (StructObj dif _ go) = do
-    let (po, compiled) = compileGraphObject texRes go
+render texRes (StructureObject dif _ go objects) = do
     GL.translate dif
-    GL.renderPrimitive po compiled
-    GL.translate (negateVector3 dif)
-
-
-render _ (Construction _ _ []) = return ()
-render texRes (Construction dif _ os) = do
-    GL.translate dif
-    mapM_ (render texRes) os
+    case compileGraphObject texRes go of
+        Just (po, compiled) -> GL.renderPrimitive po compiled
+        Nothing -> return ()
+    mapM_ (render texRes) objects
     GL.translate (negateVector3 dif)

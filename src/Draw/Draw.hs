@@ -57,6 +57,18 @@ draw ress@(GLResources texRes) n = do
                 (HsVar (UnQual (HsIdent "fact'")))
                 (HsParen t1)
 
+    let t3 = HsInfixApp
+                (HsApp
+                    (HsVar (UnQual (HsIdent "fact'")))
+                    (HsParen
+                        (HsInfixApp
+                            (HsVar (UnQual (HsIdent "n")))
+                            (HsQVarOp (UnQual (HsSymbol "-")))
+                            (HsLit (HsInt 1)))))
+                (HsQVarOp
+                    (UnQual (HsSymbol "*")))
+                    (HsVar (UnQual (HsIdent "n")))
+
     let c = constructExpr t2 NoObjectSpec NoDeriving
 
     render texRes c

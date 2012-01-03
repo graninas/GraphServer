@@ -6,6 +6,7 @@ import Common.Constants
 import Common.GLTypes
 
 data GraphObject = GO PrimitiveObject TextureName
+                 | NoGraphObject
     deriving (Show)
 
 variableBox _ l h w = GO (PrimitiveBox (vertex3 l h w)) tex2

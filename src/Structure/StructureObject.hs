@@ -9,18 +9,12 @@ import Structure.Dimensions
 import Common.Units
 import Common.GLTypes
 
-data StructureObject = 
-    StructObj
+data StructureObject = StructureObject
         {
           trans       :: Translation        
         , dimms       :: Dimensions
         , graphObject :: GraphObject
-        }
-    | Construction
-        {
-          trans   :: Translation
-        , dimms   :: Dimensions
-        , objects :: [StructureObject]   
+        , objects :: [StructureObject]
         }
     deriving (Show)
 
@@ -33,11 +27,11 @@ hsNameLength (moduleName, hsName) = 1 + (strUnits (moduleName ++ hsName))
 hsLitLength str = 1 + (strUnits str)
 
 structObject OSVariable objText diffVector objDims@(GL.Vector3 l _ _) =
-    StructObj diffVector (dimension l 2 2) (variableBox objText l 2 2)
+    StructureObject diffVector (dimension l 2 2) (variableBox objText l 2 2) []
 structObject OSFunction objText diffVector objDims@(GL.Vector3 l _ _) =
-    StructObj diffVector (dimension l 1 2) (functionBox objText l 1 2)
+    StructureObject diffVector (dimension l 1 2) (functionBox objText l 1 2) []
 structObject OSOperator objText diffVector objDims@(GL.Vector3 l _ _) =
-    StructObj diffVector (dimension l 1 2) (functionBox objText l 1 2)
+    StructureObject diffVector (dimension l 1 2) (functionBox objText l 1 2) []
 structObject NoObjectSpec _ _ _ = undefined
 
 
@@ -64,21 +58,21 @@ constructExpr (HsParen parenExp) objSpec derivedDims = constructExpr parenExp ob
 
 constructExpr (HsInfixApp l op r) _ derivedDims =
   let
-     lc @(StructObj _ (GL.Vector3 ll  _ _) _) = constructExpr l OSVariable derivedDims
-     opc@(StructObj _ (GL.Vector3 opl _ _) _) = constructOp   op
-     rc @(StructObj _ (GL.Vector3 rl  _ _) _) = constructExpr r OSVariable derivedDims
+     lc @(StructureObject _ (GL.Vector3 ll  _ _) _ _) = constructExpr l OSVariable derivedDims
+     opc@(StructureObject _ (GL.Vector3 opl _ _) _ _) = constructOp   op
+     rc @(StructureObject _ (GL.Vector3 rl  _ _) _ _) = constructExpr r OSVariable derivedDims
      lObj  = lc {trans = translation 0 0 0}
      opObj = opc{trans = translation ll 0 0}
      rObj  = rc {trans = translation (ll + opl) 0 0}
-  in  Construction nullVector3 (dimension (ll + opl + rl) 2 2) [lObj, opObj, rObj]
+  in StructureObject nullVector3 (dimension (ll + opl + rl) 2 2) NoGraphObject [lObj, opObj, rObj]
 
 constructExpr (HsApp func op) _ _ =
     let
-        opc   @(Construction _ (GL.Vector3 opl oph _) _)     = constructExpr op   OSOperator NoDeriving
+        opc   @(StructureObject _ (GL.Vector3 opl oph _)     _ _) = constructExpr op   OSOperator NoDeriving
         fDims = FuncDims (functionBoxRelativeDims (GL.Vector3 opl 1 2))
-        funcc @(StructObj    _ (GL.Vector3 funcl funch _) _) = constructExpr func OSFunction fDims
+        funcc @(StructureObject _ (GL.Vector3 funcl funch _) _ _) = constructExpr func OSFunction fDims
         opHalfL = opl / 2
         funcHalfL = funcl / 2
         opObj    = opc   {trans = translation 0 0 0}
         funcObj  = funcc {trans = translation (opHalfL - funcHalfL) (-funch) 0}
-    in  Construction nullVector3 (dimension funcl (oph + funch) 2) [opObj, funcObj]
+    in StructureObject nullVector3 (dimension funcl (oph + funch) 2) NoGraphObject [opObj, funcObj]
