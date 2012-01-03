@@ -24,54 +24,61 @@ data StructureObject =
         }
     deriving (Show)
 
-
+data ObjectSpec = NoObjectSpec
+                | OSFunction
+                | OSVariable
+                | OSOperator
 
 hsNameLength (moduleName, hsName) = 1 + (strUnits (moduleName ++ hsName))
 hsLitLength str = 1 + (strUnits str)
 
+structObject OSVariable objText diffVector objDims@(GL.Vector3 l _ _) =
+    StructObj diffVector (dimension l 2 2) (variableBox objText l 2 2)
+structObject OSFunction objText diffVector objDims@(GL.Vector3 l _ _) =
+    StructObj diffVector (dimension l 1 2) (functionBox objText l 1 2)
+structObject OSOperator objText diffVector objDims@(GL.Vector3 l _ _) =
+    StructObj diffVector (dimension l 1 2) (functionBox objText l 1 2)
+structObject NoObjectSpec _ _ _ = undefined
+
+
 constructOp (HsQVarOp opDef) = 
-    let n = getHsName opDef
-        boxLength = hsNameLength n 
-    in  StructObj  nullVector3
-                   (dimension boxLength 1 2)
-                   (functionBox n boxLength  1 2)
+    let objText = getHsName opDef
+        boxLength = hsNameLength objText 
+    in structObject OSOperator objText nullVector3 (GL.Vector3 boxLength 0 0)
 
-constructExpr :: HsExp -> DerivedDimensions -> StructureObject
-constructExpr (HsVar hsVar) derivedDims =
-    let n = getHsName hsVar
-        textLen = hsNameLength n
-        (GL.Vector3 boxLength _ _) = dimensions derivedDims (vector3 textLen 0 0)
-    in  StructObj  nullVector3
-                   (dimension boxLength 2 2)
-                   (variableBox n boxLength 2 2)
+constructExpr :: HsExp -> ObjectSpec -> DerivedDimensions -> StructureObject
+constructExpr (HsVar hsVar) objSpec derivedDims =
+    let objText = getHsName hsVar
+        textLen = hsNameLength objText
+        objDims = dimensions derivedDims (vector3 textLen 0 0)
+    in structObject objSpec objText nullVector3 objDims 
 
-constructExpr (HsLit hsLit) derivedDims =
-    let n = getHsLitStr hsLit
-        textLen = hsLitLength n
-        (GL.Vector3 boxLength _ _) = dimensions derivedDims (vector3 textLen 0 0)
-    in  StructObj  nullVector3
-                   (dimension boxLength 2 2)
-                   (variableBox n boxLength  2 2)
+constructExpr (HsLit hsLit) objSpec derivedDims =
+    let objText = getHsLitStr hsLit
+        textLen = hsLitLength objText
+        objDims = dimensions derivedDims (vector3 textLen 0 0)
+    in structObject objSpec objText nullVector3 objDims
+        
+    
+constructExpr (HsParen parenExp) objSpec derivedDims = constructExpr parenExp objSpec derivedDims
 
-constructExpr (HsParen parenExp) derivedDims = constructExpr parenExp derivedDims
-
-constructExpr (HsInfixApp l op r) derivedDims =
+constructExpr (HsInfixApp l op r) _ derivedDims =
   let
-     lc @(StructObj _ (GL.Vector3 ll  _ _) _) = constructExpr l  derivedDims
+     lc @(StructObj _ (GL.Vector3 ll  _ _) _) = constructExpr l OSVariable derivedDims
      opc@(StructObj _ (GL.Vector3 opl _ _) _) = constructOp   op
-     rc @(StructObj _ (GL.Vector3 rl  _ _) _) = constructExpr r  derivedDims
+     rc @(StructObj _ (GL.Vector3 rl  _ _) _) = constructExpr r OSVariable derivedDims
      lObj  = lc {trans = translation 0 0 0}
      opObj = opc{trans = translation ll 0 0}
      rObj  = rc {trans = translation (ll + opl) 0 0}
   in  Construction nullVector3 (dimension (ll + opl + rl) 2 2) [lObj, opObj, rObj]
 
-constructExpr (HsApp func op) _ =
+constructExpr (HsApp func op) _ _ =
     let
-        opc   @(Construction _ opDims@(GL.Vector3 opl oph _) _) = constructExpr op NoDeriving
-        fDims = FuncDims (functionBoxRelativeDims opDims)
-        funcc @(StructObj    _ (GL.Vector3 funcl funch _) _)    = constructExpr func fDims
+        opc   @(Construction _ (GL.Vector3 opl oph _) _)     = constructExpr op   OSOperator NoDeriving
+        fDims = FuncDims (functionBoxRelativeDims (GL.Vector3 opl 1 2))
+        funcc @(StructObj    _ (GL.Vector3 funcl funch _) _) = constructExpr func OSFunction fDims
         opHalfL = opl / 2
         funcHalfL = funcl / 2
         opObj    = opc   {trans = translation 0 0 0}
-        funcObj  = funcc {trans = translation (opHalfL - funcHalfL) (-oph) 0}
+        funcObj  = funcc {trans = translation (opHalfL - funcHalfL) (-funch) 0}
     in  Construction nullVector3 (dimension funcl (oph + funch) 2) [opObj, funcObj]

@@ -15,4 +15,4 @@ functionBoxRelativeDims (GL.Vector3 opl oph op) (GL.Vector3 fBoxl fBoxh fBoxw)
   where
     newL | fBoxl >= (opl + 1) = fBoxl
          | fBoxl < opl        = opl + 1
-         | otherwise       = opl + 1
+         | otherwise          = opl + 1

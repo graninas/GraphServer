@@ -57,11 +57,9 @@ draw ress@(GLResources texRes) n = do
                 (HsVar (UnQual (HsIdent "fact'")))
                 (HsParen t1)
 
+    let c = constructExpr t2 NoObjectSpec NoDeriving
 
-    let c1 = constructExpr t1 NoDeriving
-    let c2 = constructExpr t2 NoDeriving
-
-    render texRes c2
+    render texRes c
     putStrLn " Ok." 
     
     
