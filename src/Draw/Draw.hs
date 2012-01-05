@@ -71,10 +71,10 @@ draw ress@(GLResources texRes) n = do
                 (HsVar (UnQual (HsIdent "n")))
 
     --let c = constructExpr t3 NoObjectSpec NoDeriving
-    let c = constructExp (OcsExpArgument t1)
+    let c = constructExp (OcsApp t2)
     putStrLn . show $ c
     render texRes c
-    putStrLn " Ok." 
+    putStrLn " Ok."
     
     
     

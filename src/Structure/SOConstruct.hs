@@ -19,7 +19,7 @@ constructQOp (OcsInfixOperator op) = let
 
 constructExp :: ObjectConstructSpec -> StructureObject
 
-constructExp (OcsExpFuncName (HsVar func) (StructureObject _ _ (_, foundObjDims, _) _)) = let
+constructExp (OcsExpFuncName (HsVar func) (StructureObject _ (_, foundObjDims) _ _)) = let
     funcText     = makeName . getHsQualName $ func
     rawDim       = GL.Vector3 (hsNameLength funcText) 1 2
     dim          = derivedDimensions (FuncDimensions (funcBoxDerivedDims foundObjDims)) rawDim
@@ -47,13 +47,13 @@ constructExp (OcsExpArgument app@(HsApp exp1 exp2)) =
     constructExp (OcsApp app)
 
 constructExp (OcsExpArgument (HsInfixApp exp1 qOp exp2)) = let
-    exp1SO = constructExp (OcsExpArgument   exp1)
-    qOpSO  = constructQOp (OcsInfixOperator qOp)
-    exp2SO = constructExp (OcsExpArgument   exp2)
-    in connectStructureObjects OsInfixApp [exp1SO, qOpSO, exp2SO]
+    exp1So = constructExp (OcsExpArgument   exp1)
+    qOpSo  = constructQOp (OcsInfixOperator qOp)
+    exp2So = constructExp (OcsExpArgument   exp2)
+    in connectStructureObjects OsInfixApp [exp1So, qOpSo, exp2So]
 
-constructExp (OcsApp (HsApp func exp2)) = let
-    exp2SO = constructExp (OcsExpArgument exp2)
-    funcSO = constructExp (OcsExpFuncName func exp2SO)
-    in connectStructureObjects OsFunction [funcSO, exp2SO]
+constructExp (OcsApp (HsApp func exp)) = let
+    expSo  = constructExp (OcsExpArgument exp)
+    funcSo = constructExp (OcsExpFuncName func expSo)
+    in connectStructureObjects OsFunction [funcSo, expSo]
 
