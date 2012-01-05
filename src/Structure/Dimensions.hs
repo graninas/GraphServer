@@ -10,13 +10,16 @@ derivedDimensions :: DerivedDimensions -> GLfVector3 -> GLfVector3
 derivedDimensions (FuncDimensions f) dims = f dims
 
 funcBoxDerivedDims :: GLfVector3 -> GLfVector3 -> GLfVector3
-funcBoxDerivedDims (GL.Vector3 opl oph opw) (GL.Vector3 fBoxl fBoxh fBoxw)
-    = (GL.Vector3 (f opl fBoxl) (f oph fBoxh) (f opw fBoxw))
+funcBoxDerivedDims (GL.Vector3 opl oph opw) (GL.Vector3 fBoxl fBoxh fBoxw) =
+    (GL.Vector3 (f opl fBoxl) (f oph fBoxh) (f opw fBoxw))
   where
     f a b | b >= (a + 1) = b
           | b < a        = a + 1
           | otherwise    = a + 1
 
+variableBoxDims :: GLfVector3 -> GLfVector3
+variableBoxDims (GL.Vector3 varl varh varw) =
+    (GL.Vector3 (if varl < 2 then 2 else varl) varh varw)
 
 generalizedDimension :: Geometries -> Dimension
 generalizedDimension (g:gs) = toDimension (foldr f g gs)

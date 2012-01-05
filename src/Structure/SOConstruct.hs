@@ -12,10 +12,10 @@ import Common.Units
 
 
 constructQOp (OcsInfixOperator op) = let
-    opText = getHsQOpName op
-    dim = GL.Vector3 (hsNameLength opText) 1 2
-    graphObjS = functionBox opText dim
-    in StructureObject OsInfixOperator (nullVector3, dim) graphObjS []
+    opText       = getHsQOpName op
+    dim          = GL.Vector3 (hsNameLength opText) 1 2
+    graphObjSpec = functionBox opText dim
+    in StructureObject OsInfixOperator (nullVector3, dim) graphObjSpec []
 
 constructExp :: ObjectConstructSpec -> StructureObject
 
@@ -24,19 +24,21 @@ constructExp (OcsExpFuncName (HsVar func) (StructureObject _ _ (_, foundObjDims,
     rawDim       = GL.Vector3 (hsNameLength funcText) 1 2
     dim          = derivedDimensions (FuncDimensions (funcBoxDerivedDims foundObjDims)) rawDim
     graphObjSpec = functionBox funcText dim
-    in StructureObject OsFunction (nullVector3, dim) graphObjSpec []
+    in StructureObject OsFunction (nullVector3, dim)    graphObjSpec []
 
 constructExp (OcsExpArgument (HsVar var)) = let
     varText      = makeName . getHsQualName $ var
     rawDim       = GL.Vector3 (hsNameLength varText) 2 2
-    graphObjSpec = variableBox varText rawDim
-    in StructureObject OsArgument (nullVector3, rawDim) graphObjSpec []
+    dim          = derivedDimensions (FuncDimensions variableBoxDims) rawDim
+    graphObjSpec = variableBox varText dim
+    in StructureObject OsArgument (nullVector3, dim) graphObjSpec []
 
 constructExp (OcsExpArgument (HsLit lit)) = let
     litText      = getHsLitStr lit
     rawDim       = GL.Vector3 (hsNameLength litText) 2 2
-    graphObjSpec = variableBox litText rawDim
-    in StructureObject OsArgument (nullVector3, rawDim) graphObjSpec []
+    dim          = derivedDimensions (FuncDimensions variableBoxDims) rawDim
+    graphObjSpec = variableBox litText dim
+    in StructureObject OsArgument (nullVector3, dim) graphObjSpec []
 
 constructExp (OcsExpArgument (HsParen exp)) =
     constructExp (OcsExpArgument exp)
