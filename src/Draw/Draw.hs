@@ -4,6 +4,7 @@ import qualified Graphics.Rendering.OpenGL as GL
 
 import Language.Haskell.Syntax
 import Structure.StructureObject
+import Structure.SOConstruct
 import Draw.Colors
 import Draw.Render
 import Draw.Texture
@@ -67,10 +68,11 @@ draw ress@(GLResources texRes) n = do
                             (HsLit (HsInt 1)))))
                 (HsQVarOp
                     (UnQual (HsSymbol "*")))
-                    (HsVar (UnQual (HsIdent "n")))
+                (HsVar (UnQual (HsIdent "n")))
 
-    let c = constructExpr t2 NoObjectSpec NoDeriving
-
+    --let c = constructExpr t3 NoObjectSpec NoDeriving
+    let c = constructExp (OcsExpArgument t1)
+    putStrLn . show $ c
     render texRes c
     putStrLn " Ok." 
     

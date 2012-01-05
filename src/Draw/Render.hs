@@ -8,11 +8,15 @@ import Common.Units
 import Common.GLTypes
 
 
-
-render texRes (StructureObject dif _ go objects) = do
-    GL.translate dif
+renderGraphObject texRes (goTrans, _, go) = do
+    GL.translate goTrans
     case compileGraphObject texRes go of
         Just (po, compiled) -> GL.renderPrimitive po compiled
         Nothing -> return ()
+    GL.translate . negateVector3 $ goTrans
+
+render texRes (StructureObject _ (soTrans, _) goSpec objects) = do
+    GL.translate soTrans
     mapM_ (render texRes) objects
-    GL.translate (negateVector3 dif)
+    renderGraphObject texRes goSpec
+    GL.translate . negateVector3 $ soTrans

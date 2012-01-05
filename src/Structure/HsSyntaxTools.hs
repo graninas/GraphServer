@@ -2,10 +2,12 @@ module Structure.HsSyntaxTools where
 
 import Language.Haskell.Syntax
 
-getHsName (UnQual (HsIdent  identName))  = ("", identName)
-getHsName (UnQual (HsSymbol symbolName)) = ("", symbolName)
-getHsName (Qual (Module m) (HsIdent  identName))  = (m, identName)
-getHsName (Qual (Module m) (HsSymbol symbolName)) = (m, symbolName)
+makeName (moduleName, hsName) = moduleName ++ "." ++ hsName
+
+getHsQualName (UnQual (HsIdent  identName))  = ("", identName)
+getHsQualName (UnQual (HsSymbol symbolName)) = ("", symbolName)
+getHsQualName (Qual (Module m) (HsIdent  identName))  = (m, identName)
+getHsQualName (Qual (Module m) (HsSymbol symbolName)) = (m, symbolName)
 
 getHsLitStr (HsInt i)        = show i
 getHsLitStr (HsChar c)       = [c]
@@ -16,3 +18,7 @@ getHsLitStr (HsStringPrim s) = s
 getHsLitStr (HsIntPrim i)    = show i
 getHsLitStr (HsFloatPrim fl) = show fl
 getHsLitStr (HsDoublePrim d) = show d
+
+getHsQOpName op = case op of
+    HsQVarOp x -> makeName . getHsQualName $ x
+    HsQConOp x -> makeName . getHsQualName $ x

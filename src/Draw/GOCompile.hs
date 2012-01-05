@@ -40,6 +40,7 @@ compilePrimitiveObject texRes (PrimitiveBox (GL.Vertex3 x y z)) texName =
         GL.texCoord texCoordUL >> GL.vertex (vertex3 0 0 z)
     )
 
-compileGraphObject texRes (GO primitiveObj texName) = Just $ compilePrimitiveObject texRes primitiveObj texName
+compileGraphObject texRes (GraphObject primitiveObj texName) =
+    Just $ compilePrimitiveObject texRes primitiveObj texName
 compileGraphObject _ NoGraphObject = Nothing
 

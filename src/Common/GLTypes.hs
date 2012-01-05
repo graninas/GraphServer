@@ -9,12 +9,11 @@ type GLfVector3 = GL.Vector3 GL.GLfloat
 type GLfColor3  = GL.Color3  GL.GLfloat
 type GLfColor4  = GL.Color4  GL.GLfloat
 type GLfTexCoord2 = GL.TexCoord2 GL.GLfloat
-type Translation = GLfVector3
-type Dimensions  = GLfVector3
-
-
-data DerivedDimensions = NoDeriving
-                       | FuncDims (GLfVector3 -> GLfVector3)
+type Translation  = GLfVector3
+type Dimension    = GLfVector3
+type Dimensions   = [Dimension]
+type Geometry     = (Translation, Dimension)
+type Geometries   = [Geometry]
 
 type TextureName = String
 type RawTexture  = (TextureName, FilePath)

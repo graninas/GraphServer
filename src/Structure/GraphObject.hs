@@ -1,13 +1,24 @@
 module Structure.GraphObject where
 
+import qualified Graphics.Rendering.OpenGL as GL
 import Structure.PrimitiveObject
 import Common.Units
-import Common.Constants
 import Common.GLTypes
+import Common.Constants
 
-data GraphObject = GO PrimitiveObject TextureName
-                 | NoGraphObject
-    deriving (Show)
+data GraphObject = GraphObject
+     {
+         goPrimitiveObject :: PrimitiveObject
+       , goTextureName     :: TextureName
+     }
+     | NoGraphObject
+  deriving (Show)
 
-variableBox _ l h w = GO (PrimitiveBox (vertex3 l h w)) tex2
-functionBox _ l h w = GO (PrimitiveBox (vertex3 l h w)) tex2
+type GraphObjectSpec = (Translation, Dimension, GraphObject)
+
+graphObjectFromSpec :: GraphObjectSpec -> GraphObject
+graphObjectFromSpec (_, _, go) = go
+
+variableBox, functionBox :: String -> GLfVector3 -> GraphObjectSpec 
+variableBox _ dims@(GL.Vector3 l h w) = (nullVector3, dims, GraphObject (PrimitiveBox (vertex3 l h w)) tex2)
+functionBox _ dims@(GL.Vector3 l h w) = (nullVector3, dims, GraphObject (PrimitiveBox (vertex3 l h w)) tex2)
