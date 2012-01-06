@@ -5,22 +5,30 @@ import Common.GLTypes
 import Common.Units
 
 data DerivedDimensions = FuncDimensions (GLfVector3 -> GLfVector3)
+                       | FoundationDimensions
 
 derivedDimensions :: DerivedDimensions -> GLfVector3 -> GLfVector3
-derivedDimensions (FuncDimensions f) dims = f dims
+derivedDimensions (FuncDimensions f) dim = f dim
+derivedDimensions  FoundationDimensions (GL.Vector3 l h w) = vector3 (l + 2) 0.25 (w + 2)
 
+   
+-- Functions to place into DerivedDimensions
+-- | Calculates function box dimensions according to it's argument dims 
 funcBoxDerivedDims :: GLfVector3 -> GLfVector3 -> GLfVector3
 funcBoxDerivedDims (GL.Vector3 opl oph opw) (GL.Vector3 fBoxl fBoxh fBoxw) =
     (GL.Vector3 (f opl fBoxh) fBoxh (max opw fBoxw))
   where
     f  op box | op >= box       = op + 1
-              | (box - op) < 1  = op + 1
+              | (box - op) <  1 = op + 1
               | (box - op) >= 1 = box 
 
+-- | Calculates dims for variable box
 variableBoxDims :: GLfVector3 -> GLfVector3
 variableBoxDims (GL.Vector3 varl varh varw) =
     (GL.Vector3 (if varl < 2 then 2 else varl) varh varw)
 
+
+-- | Calculates general dimensions of the object group
 generalizedDimension :: Geometries -> Dimension
 generalizedDimension (g:gs) = toDimension (foldr f g gs)
   where

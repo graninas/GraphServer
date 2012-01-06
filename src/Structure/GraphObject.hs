@@ -19,6 +19,10 @@ type GraphObjectSpec = (Translation, Dimension, GraphObject)
 graphObjectFromSpec :: GraphObjectSpec -> GraphObject
 graphObjectFromSpec (_, _, go) = go
 
-variableBox, functionBox :: String -> GLfVector3 -> GraphObjectSpec 
-variableBox _ dims@(GL.Vector3 l h w) = (nullVector3, dims, GraphObject (PrimitiveBox (vertex3 l h w)) tex2)
-functionBox _ dims@(GL.Vector3 l h w) = (nullVector3, dims, GraphObject (PrimitiveBox (vertex3 l h w)) tex2)
+variableBox, functionBox :: String -> GLfVector3 -> GraphObjectSpec
+foundationBox            :: GLfVector3 -> GraphObjectSpec
+
+variableBox _  dim@(GL.Vector3 l h w) = (nullVector3, dim, GraphObject (PrimitiveBox (vertex3 l h w)) tex2)
+functionBox _  dim@(GL.Vector3 l h w) = (nullVector3, dim, GraphObject (PrimitiveBox (vertex3 l h w)) tex2)
+foundationBox  dim@(GL.Vector3 l h w) = (nullVector3, dim, GraphObject (PrimitiveBox (vertex3 l h w)) tex2)
+arrowBridgeBox dim@(GL.Vector3 l h w) = (nullVector3, dim, GraphObject (PrimitiveBox (vertex3 l h w)) tex2)

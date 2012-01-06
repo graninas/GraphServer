@@ -18,7 +18,6 @@ type Geometries   = [Geometry]
 type TextureName = String
 type RawTexture  = (TextureName, FilePath)
 type RawTextures = [RawTexture]
-
 type PreparedTextureObject  = (TextureName, GL.TextureObject)
 type PreparedTextureObjects = [PreparedTextureObject]
 

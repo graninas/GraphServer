@@ -57,3 +57,23 @@ constructExp (OcsApp (HsApp func exp)) = let
     funcSo = constructExp (OcsExpFuncName func expSo)
     in connectStructureObjects OsFunction [funcSo, expSo]
 
+constructFoundation (OcsFoundationExp expSo) = let
+    expSoDim     = geometryDim . soGeometry $ expSo
+    dim          = derivedDimensions FoundationDimensions expSoDim
+    graphObjSpec = foundationBox dim
+    in StructureObject OsFoundation (nullVector3, dim) graphObjSpec []
+
+constructArrowBridge OsArrowBridge = let
+    dim = vector3 2 0.25 2
+    graphObjSpec = arrowBridgeBox dim
+    in StructureObject OsArrowBridge (nullVector3, dim) graphObjSpec []
+
+constructGuardedRhs (OcsGuardedRhs (HsGuardedRhs _ boolExp exp)) = let
+    expSo               = constructExp (OcsExpArgument exp)
+    boolExpSo           = constructExp (OcsExpArgument boolExp)
+    expFoundationSo     = constructFoundation (OcsFoundationExp expSo)
+    boolExpFoundationSo = constructFoundation (OcsFoundationExp boolExpSo)
+    expResSo            = connectStructureObjects OsExpFoundation [expFoundationSo,     expSo]
+    boolExpResSo        = connectStructureObjects OsExpFoundation [boolExpFoundationSo, boolExpSo]
+    arrowBridgeSo       = constructArrowBridge OsArrowBridge
+    in connectStructureObjects OsGuardedRhs [arrowBridgeSo, boolExpResSo, expResSo]

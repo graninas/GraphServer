@@ -24,10 +24,16 @@ data ObjectSpec = OsFunction
                 | OsArgument
                 | OsInfixOperator
                 | OsInfixApp
+                | OsFoundation
+                | OsExpFoundation
+                | OsArrowBridge
+                | OsGuardedRhs
     deriving (Show)
 
 data ObjectConstructSpec
                 = OcsApp HsExp
-                | OcsExpArgument HsExp
-                | OcsExpFuncName HsExp StructureObject
+                | OcsExpArgument   HsExp
+                | OcsExpFuncName   HsExp StructureObject
                 | OcsInfixOperator HsQOp
+                | OcsGuardedRhs    HsGuardedRhs
+                | OcsFoundationExp StructureObject
