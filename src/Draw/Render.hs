@@ -11,7 +11,7 @@ import Common.GLTypes
 renderGraphObject texRes (goTrans, _, go) = do
     GL.translate goTrans
     case compileGraphObject texRes go of
-        Just (po, compiled) -> GL.renderPrimitive po compiled
+        Just compiled -> sequence_ compiled
         Nothing -> return ()
     GL.translate . negateVector3 $ goTrans
 

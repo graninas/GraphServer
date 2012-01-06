@@ -6,9 +6,11 @@ applicationPath = "./"
 texturesPath    = "./Textures"
 
 
-tex1 = "Crate.tga"
-tex2 = "Crate2.tga"
+tex1 = "hello.tga"
+tex2 = "hazard_stripe.tga"
+tex3 = "arrow.tga"
 
 rawTextureData :: RawTextures
 rawTextureData = [(tex1, texturesPath ++ "/" ++ tex1),
-                  (tex2, texturesPath ++ "/" ++ tex2)]
+                  (tex2, texturesPath ++ "/" ++ tex2),
+                  (tex3, texturesPath ++ "/" ++ tex3)]

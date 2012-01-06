@@ -28,8 +28,8 @@ main = do
     startTime <- T.getClockTime
 
 -- GL initializing
-    GLUT.getArgsAndInitialize
-    wnd <- GLUT.createWindow "Graph output"
+    (progName, _) <- GLUT.getArgsAndInitialize
+    wnd <- GLUT.createWindow progName
     initGL
     texs <- textures
     GLUT.displayCallback GLUT.$= (drawSceneCallback mVar (GLResources texs) draw)
