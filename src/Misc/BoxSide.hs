@@ -1,49 +1,49 @@
-module Draw.GOCompile where
+module Misc.BoxSide where
 
-import Structure.GraphObject
-import Structure.PrimitiveObject
 import qualified Graphics.Rendering.OpenGL as GL
+import Common.GLTypes
 import Common.Units
 
-compilePrimitiveObject texRes (PrimitiveBox (GL.Vertex3 x y z)) texName = 
-    [do
-       GL.color colorWhite
-       GL.textureBinding GL.Texture2D GL.$= lookup texName texRes,
+boxSideList :: [BoxSide]
+boxSideList = [SideTop, SideBottom, SideLeft, SideRight, SideRear, SideFront]
 
-     GL.renderPrimitive GL.Quads (do
-            GL.texCoord texCoordUR >> GL.vertex (vertex3 x y z)
-            GL.texCoord texCoordDR >> GL.vertex (vertex3 0 y z)
-            GL.texCoord texCoordDL >> GL.vertex (vertex3 0 0 z)
-            GL.texCoord texCoordUL >> GL.vertex (vertex3 x 0 z)
+boxSide :: GLfVertex3 -> BoxSide -> IO ()
 
-            GL.texCoord texCoordUR >> GL.vertex (vertex3 x y z)
-            GL.texCoord texCoordDR >> GL.vertex (vertex3 x y 0)
-            GL.texCoord texCoordDL >> GL.vertex (vertex3 x 0 0)
-            GL.texCoord texCoordUL >> GL.vertex (vertex3 x 0 z)
-
+boxSide (GL.Vertex3 x y z) SideTop = do
             GL.texCoord texCoordUR >> GL.vertex (vertex3 x y z)
             GL.texCoord texCoordDR >> GL.vertex (vertex3 x y 0)
             GL.texCoord texCoordDL >> GL.vertex (vertex3 0 y 0)
             GL.texCoord texCoordUL >> GL.vertex (vertex3 0 y z)
 
+boxSide (GL.Vertex3 x y z) SideFront = do
+            GL.texCoord texCoordUR >> GL.vertex (vertex3 x y z)
+            GL.texCoord texCoordDR >> GL.vertex (vertex3 0 y z)
+            GL.texCoord texCoordDL >> GL.vertex (vertex3 0 0 z)
+            GL.texCoord texCoordUL >> GL.vertex (vertex3 x 0 z)
+
+boxSide (GL.Vertex3 x y z) SideRight = do
+            GL.texCoord texCoordUR >> GL.vertex (vertex3 x y z)
+            GL.texCoord texCoordUL >> GL.vertex (vertex3 x 0 z)
+            GL.texCoord texCoordDL >> GL.vertex (vertex3 x 0 0)
+            GL.texCoord texCoordDR >> GL.vertex (vertex3 x y 0)
+            
+boxSide (GL.Vertex3 x y z) SideRear = do
             GL.texCoord texCoordUR >> GL.vertex (vertex3 0 0 0)
             GL.texCoord texCoordDR >> GL.vertex (vertex3 0 y 0)
             GL.texCoord texCoordDL >> GL.vertex (vertex3 x y 0)
             GL.texCoord texCoordUL >> GL.vertex (vertex3 x 0 0)
 
+boxSide (GL.Vertex3 x y z) SideLeft = do
             GL.texCoord texCoordUR >> GL.vertex (vertex3 0 0 0)
             GL.texCoord texCoordDR >> GL.vertex (vertex3 0 0 z)
             GL.texCoord texCoordDL >> GL.vertex (vertex3 0 y z)
             GL.texCoord texCoordUL >> GL.vertex (vertex3 0 y 0)
 
+boxSide (GL.Vertex3 x y z) SideBottom = do
             GL.texCoord texCoordUR >> GL.vertex (vertex3 0 0 0)
             GL.texCoord texCoordDR >> GL.vertex (vertex3 x 0 0)
             GL.texCoord texCoordDL >> GL.vertex (vertex3 x 0 z)
-            GL.texCoord texCoordUL >> GL.vertex (vertex3 0 0 z))]
-            
+            GL.texCoord texCoordUL >> GL.vertex (vertex3 0 0 z)
 
-
-compileGraphObject texRes (GraphObject primitiveObj texName) =
-    Just $ compilePrimitiveObject texRes primitiveObj texName
-compileGraphObject _ NoGraphObject = Nothing
-
+boxSides    boxDim = mapM_ (boxSide boxDim)
+allBoxSides boxDim = boxSides boxDim boxSideList

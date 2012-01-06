@@ -3,16 +3,15 @@ module Draw.Render where
 import qualified Graphics.Rendering.OpenGL as GL
 
 import Structure.StructureObject
-import Draw.GOCompile
+import Structure.GOCompile
 import Common.Units
 import Common.GLTypes
 
 
 renderGraphObject texRes (goTrans, _, go) = do
     GL.translate goTrans
-    case compileGraphObject texRes go of
-        Just compiled -> sequence_ compiled
-        Nothing -> return ()
+    let compiled = compileGraphObject texRes go
+    sequence_ compiled
     GL.translate . negateVector3 $ goTrans
 
 render texRes (StructureObject _ (soTrans, _) goSpec objects) = do

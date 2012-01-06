@@ -8,10 +8,11 @@ import qualified Control.Concurrent as C
 import qualified System.Time as T
 import qualified Graphics.UI.GLUT as GLUT
 
-import Common.GLInit
+import Draw.GLInit
 import Draw.Draw
-import Draw.Texture
+import Draw.TextureInit
 import Common.GLTypes
+import Common.Constants
 
 
 main::IO ()
@@ -31,7 +32,7 @@ main = do
     (progName, _) <- GLUT.getArgsAndInitialize
     wnd <- GLUT.createWindow progName
     initGL
-    texs <- textures
+    texs <- makeTextures rawTextureData
     GLUT.displayCallback GLUT.$= (drawSceneCallback mVar (GLResources texs) draw)
     GLUT.reshapeCallback GLUT.$= Just resizeSceneCallback
 

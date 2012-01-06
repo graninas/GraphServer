@@ -18,9 +18,16 @@ type Geometries   = [Geometry]
 type TextureName = String
 type RawTexture  = (TextureName, FilePath)
 type RawTextures = [RawTexture]
+
 type PreparedTextureObject  = (TextureName, GL.TextureObject)
 type PreparedTextureObjects = [PreparedTextureObject]
-
 data GLResources = GLResources PreparedTextureObjects
 
 type DrawFunction = GLResources -> GL.GLfloat -> IO ()
+ 
+
+data BoxSide  = SideTop | SideBottom | SideLeft | SideRight | SideRear | SideFront
+    deriving (Show, Eq)
+data QuadSide = QuadUp | QuadDown | QuadLeft | QuadRight
+    deriving (Show, Eq)
+

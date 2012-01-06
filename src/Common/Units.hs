@@ -35,8 +35,9 @@ geometryTrans, geometryDim :: Geometry -> GLfVector3
 geometryTrans (trans, _) = trans
 geometryDim   (_, dim)   = dim
 
-colorWhite :: GLfColor4
+colorWhite, colorBlack :: GLfColor4
 colorWhite = color4 1 1 1 1
+colorBlack = color4 0 0 0 1
 
 texCoordUR, texCoordDR, texCoordDL, texCoordUL :: GLfTexCoord2
 texCoordUR = texCoord2 1 0

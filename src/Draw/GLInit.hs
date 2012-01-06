@@ -1,4 +1,4 @@
-module Common.GLInit where
+module Draw.GLInit where
 
 import Graphics.Rendering.OpenGL
 import qualified Graphics.Rendering.OpenGL.Raw as GLRaw
