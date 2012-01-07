@@ -8,6 +8,7 @@ import Structure.GraphObject
 import Structure.Texture
 import Common.Units
 import Common.GLTypes
+import Common.Constants
 import Misc.BoxSide
 
 -- | Sets texture or/and current color to draw next objects.
@@ -16,7 +17,9 @@ setQuadColorSpec _ NoQuadColorSpec = return ()
 setQuadColorSpec texRes (QuadTexture (quadSide, texName)) =
     do  GL.color colorWhite
         GL.textureBinding GL.Texture2D GL.$= lookup texName texRes
-setQuadColorSpec texRes (QuadPlainColor col) = GL.color col
+setQuadColorSpec texRes (QuadPlainColor col) = do
+    GL.textureBinding GL.Texture2D GL.$= Nothing
+    GL.color col
 
 -- | Collects actions for specified box side drawings.
 -- | It should be used only in this module.
@@ -27,9 +30,8 @@ f :: PreparedTextureObjects
     -> ([BoxSide], [IO()])
 f texRes boxDim (side, qColorSpec) (sList, ioList) = let
     boxIO = do  setQuadColorSpec texRes qColorSpec
-                boxSide boxDim side
+                GL.renderPrimitive GL.Quads (boxSide boxDim side)
     in (side : sList, boxIO : ioList) 
-     
 
 -- | Compiles GraphObject into action list structure, which is ready-to-eval. ([IO ()]) 
 compileGraphObject texRes (PrimitiveBox boxDim texName) =
@@ -42,7 +44,7 @@ compileGraphObject texRes (TexturedBox boxDim boxTexSpec) = let
     (textedSides, textedSideDrawList) = foldr (f texRes boxDim) ([], []) sideTexes
     untextedSides = [s | s <- boxSideList, s `notElem` textedSides]
     untextedQColor = setQuadColorSpec texRes defTex
-    untextedSidesDraw = boxSides boxDim untextedSides
+    untextedSidesDraw = GL.renderPrimitive GL.Quads (boxSides boxDim untextedSides)
     in untextedQColor : untextedSidesDraw : textedSideDrawList
 
 compileGraphObject _ NoGraphObject = []

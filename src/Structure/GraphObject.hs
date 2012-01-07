@@ -26,6 +26,6 @@ arrowBridgeBox dim@(GL.Vector3 l h w) = (nullVector3, dim, TexturedBox  (vertex3
   where
       boxTexSpec = BoxTextureSpec texes defTex
       texes      = [(SideTop, QuadTexture (QuadRight, arrowTex))]
-      defTex     = QuadPlainColor colorBlack
+      defTex     = QuadPlainColor colorWhite
 
           

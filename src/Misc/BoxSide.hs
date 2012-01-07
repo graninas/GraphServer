@@ -4,17 +4,10 @@ import qualified Graphics.Rendering.OpenGL as GL
 import Data.List (cycle) 
 import Common.GLTypes
 import Common.Units
+import Structure.Texture
 
 boxSideList :: [BoxSide]
 boxSideList = [SideTop, SideBottom, SideLeft, SideRight, SideRear, SideFront]
-
-quadTexRotating QuadUp    = 0
-quadTexRotating QuadLeft  = 1
-quadTexRotating QuadDown  = 2
-quadTexRotating QuadRight = 3 
-
-
-
 
 boxSide :: GLfVertex3 -> BoxSide -> IO ()
 

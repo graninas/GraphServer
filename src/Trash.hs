@@ -56,3 +56,31 @@ constructExpr (HsInfixApp l op r) _ derivedDims =
      opObj = opc{trans = translation (ll + ldx) ldy ldz}
      rObj  = rc {trans = translation (ll + opl + ldx) ldy ldz}
   in StructureObject nullVector3 (dimension (ll + opl + rl) 2 2) NoGraphObject [lObj, opObj, rObj]
+  
+  --------------------------
+  
+  
+-- | Collects actions for specified box side drawings.
+-- | It should be used only in this module.
+f :: PreparedTextureObjects
+    -> GLfVertex3 
+    -> (BoxSide, QuadColorSpec)
+    -> ([BoxSide], [IO()])
+    -> ([BoxSide], [IO()])
+f texRes boxDim (side, qColorSpec) (sList, ioList) = let
+    boxIO = do  setQuadColorSpec texRes qColorSpec
+                boxSide boxDim side
+    in (side : sList, boxIO : ioList) 
+    
+        (BoxTextureSpec sideTexes defTex) = boxTexSpec
+    (textedSides, textedSideDrawList) = foldr (f texRes boxDim) ([], []) sideTexes
+    untextedSides = [s | s <- boxSideList, s `notElem` textedSides]
+    untextedQColor = setQuadColorSpec texRes defTex
+    untextedSidesDraw = boxSides boxDim untextedSides
+    in [do  allBoxSides boxDim
+            GL.color colorWhite
+            GL.textureBinding GL.Texture2D GL.$= lookup hazardStripeTex texRes
+            allBoxSides boxDim
+            putStrLn ("\nDims: \n" ++ show boxDim)
+            putStrLn . show $ (lookup hazardStripeTex texRes)
+            putStrLn ("textedCnt:" ++ (show . length $ textedSideDrawList))]

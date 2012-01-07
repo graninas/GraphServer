@@ -1,3 +1,11 @@
+data ObjectSpec = NoObjectSpec
+                | OSFunction
+                | OSVariable
+                | OSOperator
+
+hsNameLength (moduleName, hsName) = 1 + (strUnits (moduleName ++ hsName))
+hsLitLength str = 1 + (strUnits str)
+
 structObject OSVariable objText diffVector objDims@(GL.Vector3 l _ _) =
     StructureObject diffVector (dimension l 2 2) (variableBox objText l 2 2) []
 structObject OSFunction objText diffVector objDims@(GL.Vector3 l _ _) =

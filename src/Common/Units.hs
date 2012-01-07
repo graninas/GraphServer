@@ -62,11 +62,4 @@ strUnits s        = let
                         d = fromIntegral l * 0.5
                     in d :: GL.GLfloat
 
--- | Texture coordinates for quad.
-
-texCoordUR, texCoordDR, texCoordDL, texCoordUL :: GLfTexCoord2
-texCoordUR = texCoord2 1 1
-texCoordDR = texCoord2 1 0
-texCoordDL = texCoord2 0 0
-texCoordUL = texCoord2 0 1
 
