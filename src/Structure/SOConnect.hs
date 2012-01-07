@@ -31,19 +31,20 @@ connectStructureObjects OsExpFoundation (foundSo:expSo:[]) = let
     (generalDim, newFoundGoSpec, newExpSo) = calcFoundationLikeParams foundSo expSo
     in StructureObject OsExpFoundation (nullVector3, generalDim) newFoundGoSpec [newExpSo]
 
-connectStructureObjects OsGuardedRhs (arrowBridgeSo : boolExpResSo : expResSo : []) = let
-    boolExpDim@(GL.Vector3 bel  beh  bew)  = geometryDim . soGeometry $ boolExpResSo
+connectStructureObjects OsGuardedRhs (arrowBridgeSo : boolExpFoundSo : expFoundSo : []) = let
+    boolExpDim@(GL.Vector3 bel  beh  bew)  = geometryDim . soGeometry $ boolExpFoundSo
     arrDim    @(GL.Vector3 arrl arrh arrw) = geometryDim . soGeometry $ arrowBridgeSo
-    expDim    @(GL.Vector3 expl exph expw) = geometryDim . soGeometry $ expResSo
-    (_, (GL.Vector3 _ bfdh _), _)          = soGraphObjectSpec boolExpResSo
+    expDim    @(GL.Vector3 expl exph expw) = geometryDim . soGeometry $ expFoundSo
+    (_, (GL.Vector3 _ bfdh _), _)          = soGraphObjectSpec boolExpFoundSo
     boolExpTrans     = nullVector3
     arrTrans         = vector3 bel         (bfdh - arrh) ((bew / 2) - (arrw  / 2))
     expTrans         = vector3 (bel + arrl) 0           0
     generalDim       = generalizedDimension [(boolExpTrans, boolExpDim), (expTrans, expDim), (arrTrans, arrDim)]
-    newBoolExpSoSpec = (boolExpTrans, boolExpDim,  graphObjectFromSpec . soGraphObjectSpec $ boolExpResSo)
+    newBoolExpSo     = boolExpFoundSo {soGeometry = (boolExpTrans, boolExpDim)}
     newArrSo         = arrowBridgeSo {soGeometry = (arrTrans, arrDim)}
-    newExpSo         = expResSo      {soGeometry = (expTrans, expDim)}
-    in StructureObject OsGuardedRhs (nullVector3, generalDim) newBoolExpSoSpec [newArrSo, newExpSo]
+    newExpSo         = expFoundSo      {soGeometry = (expTrans, expDim)}
+    newBoolExpSoSpec = (nullTranslation, nullDimension, NoGraphObject)
+    in StructureObject OsGuardedRhs (nullVector3, generalDim) newBoolExpSoSpec [newBoolExpSo, newArrSo, newExpSo]
 
 
 

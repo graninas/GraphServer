@@ -25,7 +25,7 @@ foundationBox  dim@(GL.Vector3 l h w) = (nullVector3, dim, PrimitiveBox (vertex3
 arrowBridgeBox dim@(GL.Vector3 l h w) = (nullVector3, dim, TexturedBox  (vertex3 l h w) boxTexSpec)
   where
       boxTexSpec = BoxTextureSpec texes defTex
-      texes      = [(SideTop, QuadTexture (QuadRight, arrowTex))]
+      texes      = [(SideTop, QuadTexture arrowTex)]
       defTex     = QuadPlainColor colorWhite
 
           

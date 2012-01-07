@@ -4,7 +4,7 @@ import qualified Graphics.Rendering.OpenGL as GL
 import Common.GLTypes
 import Common.Units
 
-data QuadColorSpec = QuadTexture (QuadSide, TextureName)
+data QuadColorSpec = QuadTexture TextureName
                    | QuadPlainColor GLfColor4
                    | NoQuadColorSpec
     deriving (Show)

@@ -14,7 +14,7 @@ import Misc.BoxSide
 -- | Sets texture or/and current color to draw next objects.
 setQuadColorSpec :: PreparedTextureObjects -> QuadColorSpec -> IO ()
 setQuadColorSpec _ NoQuadColorSpec = return ()
-setQuadColorSpec texRes (QuadTexture (quadSide, texName)) =
+setQuadColorSpec texRes (QuadTexture texName) =
     do  GL.color colorWhite
         GL.textureBinding GL.Texture2D GL.$= lookup texName texRes
 setQuadColorSpec texRes (QuadPlainColor col) = do
