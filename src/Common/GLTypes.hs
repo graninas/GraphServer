@@ -26,8 +26,17 @@ data GLResources = GLResources PreparedTextureObjects
 type DrawFunction = GLResources -> GL.GLfloat -> IO ()
  
 
-data BoxSide  = SideTop | SideBottom | SideLeft | SideRight | SideRear | SideFront
+data BoxSide = SideTop
+             | SideBottom
+             | SideLeft
+             | SideRight
+             | SideRear
+             | SideFront
     deriving (Show, Eq)
-data QuadSide = QuadUp | QuadDown | QuadLeft | QuadRight
+    
+data QuadSide = QuadUp
+              | QuadDown
+              | QuadLeft
+              | QuadRight
     deriving (Show, Eq)
 

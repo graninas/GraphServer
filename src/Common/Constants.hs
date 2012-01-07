@@ -9,6 +9,7 @@ hazardStripeTex = "hazard_stripe.tga"
 arrowTex        = "arrow.tga"
 
 rawTextureData :: RawTextures
-rawTextureData = [(helloTex,        texturesPath ++ "/" ++ helloTex),
-                  (hazardStripeTex, texturesPath ++ "/" ++ hazardStripeTex),
-                  (arrowTex,        texturesPath ++ "/" ++ arrowTex)]
+rawTextureData = [ (helloTex,        texturesPath ++ "/" ++ helloTex)
+                 , (hazardStripeTex, texturesPath ++ "/" ++ hazardStripeTex)
+                 , (arrowTex,        texturesPath ++ "/" ++ arrowTex)
+                 ]

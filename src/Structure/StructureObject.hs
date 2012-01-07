@@ -10,13 +10,11 @@ import Common.Units
 import Common.GLTypes
 
 data StructureObject = StructureObject
-        {
-          soObjectSpec       :: ObjectSpec
+        { soObjectSpec       :: ObjectSpec
         , soGeometry         :: Geometry
         , soGraphObjectSpec  :: GraphObjectSpec
         , soStructureObjects :: StructureObjects
-        }
-    deriving (Show)
+        } deriving (Show)
 
 type StructureObjects = [StructureObject]
 

@@ -3,7 +3,6 @@ module Common.Units where
 import qualified Graphics.Rendering.OpenGL as GL
 import Common.GLTypes
 
-max3 a b c = max a (max b c)
 
 vertex3   :: GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GLfVertex3
 vector3   :: GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GLfVector3
@@ -27,6 +26,9 @@ nullGeometry    = (nullVector3, nullVector3)
 nullDimension   = nullVector3
 nullTranslation = nullVector3
 
+negateVector3 :: GLfVector3 -> GLfVector3
+negateVector3 (GL.Vector3 x y z) = GL.Vector3 (-x) (-y) (-z)
+
 translation, dimension :: GL.GLfloat -> GL.GLfloat -> GL.GLfloat -> GLfVector3
 translation = vector3
 dimension   = vector3
@@ -38,15 +40,6 @@ geometryDim   (_, dim)   = dim
 colorWhite, colorBlack :: GLfColor4
 colorWhite = color4 1 1 1 1
 colorBlack = color4 0 0 0 1
-
-texCoordUR, texCoordDR, texCoordDL, texCoordUL :: GLfTexCoord2
-texCoordUR = texCoord2 1 0
-texCoordDR = texCoord2 0 0
-texCoordDL = texCoord2 0 1
-texCoordUL = texCoord2 1 1
-
-negateVector3 :: GLfVector3 -> GLfVector3
-negateVector3 (GL.Vector3 x y z) = GL.Vector3 (-x) (-y) (-z)
 
 unit :: GL.GLfloat -> GL.GLfloat
 unit n    = (1.0 * n)
@@ -69,4 +62,11 @@ strUnits s        = let
                         d = fromIntegral l * 0.5
                     in d :: GL.GLfloat
 
+-- | Texture coordinates for quad.
+
+texCoordUR, texCoordDR, texCoordDL, texCoordUL :: GLfTexCoord2
+texCoordUR = texCoord2 1 1
+texCoordDR = texCoord2 1 0
+texCoordDL = texCoord2 0 0
+texCoordUL = texCoord2 0 1
 

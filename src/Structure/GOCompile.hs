@@ -10,6 +10,7 @@ import Common.Units
 import Common.GLTypes
 import Misc.BoxSide
 
+-- | Sets texture or/and current color to draw next objects.
 setQuadColorSpec :: PreparedTextureObjects -> QuadColorSpec -> IO ()
 setQuadColorSpec _ NoQuadColorSpec = return ()
 setQuadColorSpec texRes (QuadTexture (quadSide, texName)) =
@@ -17,6 +18,8 @@ setQuadColorSpec texRes (QuadTexture (quadSide, texName)) =
         GL.textureBinding GL.Texture2D GL.$= lookup texName texRes
 setQuadColorSpec texRes (QuadPlainColor col) = GL.color col
 
+-- | Collects actions for specified box side drawings.
+-- | It should be used only in this module.
 f :: PreparedTextureObjects
     -> GLfVertex3 
     -> (BoxSide, QuadColorSpec)
@@ -28,7 +31,7 @@ f texRes boxDim (side, qColorSpec) (sList, ioList) = let
     in (side : sList, boxIO : ioList) 
      
 
-
+-- | Compiles GraphObject into action list structure, which is ready-to-eval. ([IO ()]) 
 compileGraphObject texRes (PrimitiveBox boxDim texName) =
     [do GL.color colorWhite
         GL.textureBinding GL.Texture2D GL.$= lookup texName texRes
@@ -43,16 +46,3 @@ compileGraphObject texRes (TexturedBox boxDim boxTexSpec) = let
     in untextedQColor : untextedSidesDraw : textedSideDrawList
 
 compileGraphObject _ NoGraphObject = []
-
-{-
-data QuadColorSpec = QuadTexture (QuadSide, TextureName)
-                   | QuadPlainColor GLfColor4
-    deriving (Show)
-
-data ObjectTextureSpec = BoxTextureSpec
-        {
-            quadSideTexes  :: [(BoxSide, QuadColorSpec)]
-          , defQuadSideTex :: Maybe QuadColorSpec
-        }
-    deriving (Show)
-    -}
