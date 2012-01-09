@@ -8,6 +8,10 @@ import Structure.GraphObject
 import Structure.Dimensions
 import Common.Units
 
+
+framedGrhsDistance = unit2
+
+
 connectStructureObjects :: ObjectSpec -> StructureObjects -> StructureObject
 
 connectStructureObjects OsInfixApp (exp1So : opSo : exp2So : []) = let
@@ -33,8 +37,9 @@ connectStructureObjects OsExpFoundation (foundSo:expSo:[]) = let
     (generalDim, newFoundGoSpec, newExpSo) = calcFoundationLikeParams foundSo expSo
     in StructureObject OsExpFoundation (nullVector3, generalDim) newFoundGoSpec [newExpSo]
 
-connectStructureObjects (OsGuardedRhs arrowBridgeSo)
-                        (boolExpFoundSo : equalSignSo : expFoundSo : []) = let
+connectStructureObjects
+        OsGuardedRhs
+        (arrowBridgeSo : boolExpFoundSo : equalSignSo : expFoundSo : []) = let
     arrDim    @(GL.Vector3 arrl arrh arrw) = geometryDim . soGeometry $ arrowBridgeSo
     boolExpDim@(GL.Vector3 bel  beh  bew)  = geometryDim . soGeometry $ boolExpFoundSo
     eqSignDim @(GL.Vector3 eql  eqh  eqw)  = geometryDim . soGeometry $ equalSignSo
@@ -54,9 +59,8 @@ connectStructureObjects (OsGuardedRhs arrowBridgeSo)
     newEqSBridgeSo   = equalSignSo    {soGeometry = (eqSTrans,     eqSignDim)}
     newExpSo         = expFoundSo     {soGeometry = (expTrans,     expDim)}
     geom             = (nullVector3, generalDim)
-    arrBridgeSpec    = OsGuardedRhs newArrBridgeSo
     structObjects    = [newArrBridgeSo, newBoolExpSo, newEqSBridgeSo, newExpSo]
-    in StructureObject arrBridgeSpec geom nullGraphObjSpec structObjects
+    in StructureObject OsGuardedRhs geom nullGraphObjSpec structObjects
 
 connectStructureObjects OsFramedGrhs (frBridgeSo : frameSo : grhsSo : []) = let
     (OsGuardFrame outer inner)  = soObjectSpec frameSo
@@ -67,9 +71,9 @@ connectStructureObjects OsFramedGrhs (frBridgeSo : frameSo : grhsSo : []) = let
     frBridgeTrans = nullVector3
     frameTrans    = vector3 (fbl - (fl / 2)) ((fih - fh) / 2) ((fbw - fw) / 2)
     grhsTrans     = vector3 fbl 0 0
-    generalDim    = generalizedDimension [ (frameTrans,    frameDim)
-                                         , (frBridgeTrans, frBridgeDim)
-                                         , (grhsTrans,     grhsDim)]
+    generalDim    = generalizedDimension   [ (frameTrans,    frameDim)
+                                           , (frBridgeTrans, frBridgeDim)
+                                           , (grhsTrans,     grhsDim)]
     newFrBridgeSo = frBridgeSo {soGeometry = (frBridgeTrans, frBridgeDim)}
     newFrameSo    = frameSo    {soGeometry = (frameTrans,    frameDim)}
     newGhhsSo     = grhsSo     {soGeometry = (grhsTrans,     grhsDim)}
@@ -77,7 +81,23 @@ connectStructureObjects OsFramedGrhs (frBridgeSo : frameSo : grhsSo : []) = let
     structObjects = [newFrBridgeSo, newFrameSo, newGhhsSo]
     in StructureObject OsFramedGrhs geom nullGraphObjSpec structObjects
 
+connectStructureObjects OsFramedGrhss objects = let
+    startPos                 = ([], nullVector3, nullVector3)
+    (os, generalDim, _)      = foldr translateFramedGrhs startPos objects
+    in StructureObject OsFramedGrhss (nullVector3, generalDim) nullGraphObjSpec os
 
+translateFramedGrhs so@(StructureObject OsFramedGrhs (_, dim) _ _)
+                    (doneObjects, genDim, trans) = let
+    (GL.Vector3 dx dy dz) = trans
+    (GL.Vector3 _  _  w)  = dim
+    newSo      = so {soGeometry = (trans, dim)}
+    newTrans   = vector3 dx dy (dz + w + framedGrhsDistance)
+    generalDim = generalizedDimension [ (trans,       dim)
+                                      , (nullVector3, genDim)]
+    in (newSo : doneObjects, generalDim, newTrans)
+
+-- | Calculates and returns parameters for objects which one above another
+-- | like foundation objects (see sketches).
 calcFoundationLikeParams funcSo expSo = let
     funcSoDim@(GL.Vector3 funcdl funcdh funcdw) = geometryDim . soGeometry $ funcSo
     expSoDim @(GL.Vector3  expdl  expdh  expdw) = geometryDim . soGeometry $ expSo

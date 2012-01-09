@@ -98,11 +98,11 @@ constructGuardedRhs (OcsGuardedRhs (HsGuardedRhs _ boolExp exp)) = let
     boolExpStructObjects = [boolExpFoundationSo, boolExpSo]
     expResSo             = connectStructureObjects OsExpFoundation expStructObjects
     boolExpResSo         = connectStructureObjects OsExpFoundation boolExpStructObjects
-    guargedRhsSoObjects  = [boolExpResSo, equalSignBridgeSo, expResSo]
-    in connectStructureObjects (OsGuardedRhs arrowBridgeSo) guargedRhsSoObjects
+    guargedRhsSoObjects  = [arrowBridgeSo, boolExpResSo, equalSignBridgeSo, expResSo]
+    in connectStructureObjects OsGuardedRhs guargedRhsSoObjects
 
 constructFramedGRhss :: ObjectConstructSpec -> StructureObject
 constructFramedGRhss (OcsGuardedRhss (HsGuardedRhss rhss)) = let
     guardedRhss = map (constructGuardedRhs . OcsGuardedRhs) rhss
     framedGRhss = map constructFramedGRhs guardedRhss
-    in head framedGRhss
+    in connectStructureObjects OsFramedGrhss framedGRhss
