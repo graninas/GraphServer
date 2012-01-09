@@ -74,8 +74,8 @@ constructBridge ocsBridgeType = let
 
 constructGuardFrame :: StructureObject
 constructGuardFrame = let
-    outerDim     = vector3 4 4 1
-    innerDim     = vector3 2 2 1
+    outerDim     = vector3 1 4 4
+    innerDim     = vector3 1 2 2
     gFrameGoSpec = guardFrame outerDim innerDim
     gFrameGeom   = (nullTranslation, outerDim)
     in StructureObject (OsGuardFrame outerDim innerDim) gFrameGeom gFrameGoSpec []

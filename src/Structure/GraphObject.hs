@@ -42,15 +42,15 @@ bridgeBox dim@(GL.Vector3 l h w) texName =
 -- | |1 |____|2 |
 -- | |__|_4__|__| | y1
 -- | ___
--- |  x1
+-- |  w1
 guardFrame outBoxDim inBoxDim = let
      (GL.Vector3 obl obh obw) = outBoxDim
-     (GL.Vector3 ibl ibh _)   = inBoxDim
-     (x1, y1) = ((obl - ibl) / 2, (obh - ibh) / 2)
-     b1@(b1Trans, b1Dim) = (vector3 0           0 0, vector3 x1 obh obw)
-     b2@(b2Trans, b2Dim) = (vector3 (ibl + x1)  0 0, vector3 x1 obh obw)
-     b3@(b3Trans, b3Dim) = (vector3 x1 (ibh + y1) 0, vector3 ibl y1 obw)
-     b4@(b4Trans, b4Dim) = (vector3 x1          0 0, vector3 ibl y1 obw)
+     (GL.Vector3 ibl ibh ibw) = inBoxDim
+     (y1, w1) = ((obh - ibh) / 2, (obw - ibw) / 2)
+     b1@(b2Trans, b2Dim) = (vector3 0           0 0, vector3 obl obh w1)
+     b2@(b1Trans, b1Dim) = (vector3 0 0 (ibw + w1),  vector3 obl obh w1)
+     b3@(b3Trans, b3Dim) = (vector3 0 (ibh + y1) w1, vector3 obl y1 ibw)
+     b4@(b4Trans, b4Dim) = (vector3 0 0          w1, vector3 obl y1 ibw)
      box1Go = primitiveBox b1Trans b1Dim hazardStripeTex
      box2Go = primitiveBox b2Trans b2Dim hazardStripeTex
      box3Go = primitiveBox b3Trans b3Dim hazardStripeTex
