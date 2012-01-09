@@ -26,7 +26,9 @@ data ObjectSpec = OsFunction
                 | OsExpFoundation
                 | OsArrowBridge
                 | OsEqualSignBridge
-                | OsGuardedRhs StructureObject
+                | OsGuardFrame Dimension Dimension -- outerDim, innerDim
+                | OsGuardedRhs StructureObject     -- preBoolExpBridge
+                | OsFramedGrhs
     deriving (Show)
 
 data ObjectConstructSpec
@@ -37,5 +39,7 @@ data ObjectConstructSpec
                 | OcsGuardedRhs    HsGuardedRhs
                 | OcsFoundationExp StructureObject
                 | OcsGuardedRhss   HsRhs
+                | OcsArrowBridge
+                | OcsEqualSignBridge
                 
                 

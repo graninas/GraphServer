@@ -5,6 +5,7 @@ import Common.Units
 import Common.GLTypes
 import Common.Constants
 import Structure.Texture
+import Structure.Dimensions
 
 data GraphObject = NoGraphObject
                  | PrimitiveBox GLfVertex3 TextureName
@@ -34,7 +35,7 @@ bridgeBox dim@(GL.Vector3 l h w) texName =
       texes      = [(SideTop, QuadTexture texName)]
       defTex     = QuadTexture yellowBaseTex
 
--- | Guard frame is graph object for '|' sing in guards.
+-- | Guard frame is graph object for pipe sign ('|') in guards.
 -- | ____________
 -- | |  |_3__|  |
 -- | |  |    |  |
@@ -42,18 +43,18 @@ bridgeBox dim@(GL.Vector3 l h w) texName =
 -- | |__|_4__|__| | y1
 -- | ___
 -- |  x1
-guardFrame trans outBoxDim inBoxDim = let
-     (GL.Vector3 dx  dy  dz)  = trans
+guardFrame outBoxDim inBoxDim = let
      (GL.Vector3 obl obh obw) = outBoxDim
      (GL.Vector3 ibl ibh _)   = inBoxDim
-     x1 = (obl - ibl) / 2
-     y1 = (obh - ibh) / 2
-     box1Trans = trans
-     box2Trans = vector3 (dx + ibl + x1) dy dz   
-     box3Trans = vector3 (x1 + dx) (dy + ibh + y1) dz
-     box4Trans = vector3 (x1 + dx) dy dz
-     box1Spec  = primitiveBox box1Trans (vector3 x1 obh obw) hazardStripeTex
-     box2Spec  = primitiveBox box2Trans (vector3 x1 obh obw) hazardStripeTex
-     box3Spec  = primitiveBox box3Trans (vector3 ibl y1 obw) hazardStripeTex
-     box4Spec  = primitiveBox box4Trans (vector3 ibl y1 obw) hazardStripeTex
-     in GraphObjects [box1Spec, box2Spec, box3Spec, box4Spec]
+     (x1, y1) = ((obl - ibl) / 2, (obh - ibh) / 2)
+     b1@(b1Trans, b1Dim) = (vector3 0           0 0, vector3 x1 obh obw)
+     b2@(b2Trans, b2Dim) = (vector3 (ibl + x1)  0 0, vector3 x1 obh obw)
+     b3@(b3Trans, b3Dim) = (vector3 x1 (ibh + y1) 0, vector3 ibl y1 obw)
+     b4@(b4Trans, b4Dim) = (vector3 x1          0 0, vector3 ibl y1 obw)
+     box1Go = primitiveBox b1Trans b1Dim hazardStripeTex
+     box2Go = primitiveBox b2Trans b2Dim hazardStripeTex
+     box3Go = primitiveBox b3Trans b3Dim hazardStripeTex
+     box4Go = primitiveBox b4Trans b4Dim hazardStripeTex
+     genDim = generalizedDimension [b1, b2, b3, b4]
+     in (nullVector3, genDim, GraphObjects [box1Go, box2Go, box3Go, box4Go])
+

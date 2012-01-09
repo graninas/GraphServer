@@ -17,7 +17,9 @@ connectStructureObjects OsInfixApp (exp1So : opSo : exp2So : []) = let
     exp1Trans    = nullVector3
     opTrans      = vector3  e1dl         0 0
     exp2Trans    = vector3 (e1dl + opdl) 0 0
-    generalDim   = generalizedDimension [(exp1Trans, exp1SoDim), (exp2Trans, exp2SoDim), (opTrans, opSoDim)]
+    generalDim   = generalizedDimension [ (exp1Trans, exp1SoDim)
+                                        , (exp2Trans, exp2SoDim)
+                                        , (opTrans, opSoDim)]
     newOpGoSpec  = (opTrans, opSoDim, graphObjectFromSpec . soGraphObjectSpec $ opSo)
     newExp1So    = exp1So {soGeometry = (exp1Trans, exp1SoDim)}
     newExp2So    = exp2So {soGeometry = (exp2Trans, exp2SoDim)}
@@ -43,21 +45,37 @@ connectStructureObjects (OsGuardedRhs arrowBridgeSo)
     boolExpTrans     = vector3 arrl (arrh - bfdh) ((arrw - bfdw) / 2)
     eqSTrans         = vector3 (arrl + bel) 0 0
     expTrans         = vector3 (arrl + bel + eql) (arrh - efdh) ((arrw - efdw) / 2)
-    generalDim       = generalizedDimension [(boolExpTrans, boolExpDim)
-                                            , (expTrans, expDim)
-                                            , (arrTrans, arrDim)
-                                            , (eqSTrans, eqSignDim)]
-    newArrBridgeSo   = arrowBridgeSo  {soGeometry = (arrTrans, arrDim)}
+    generalDim       = generalizedDimension [ (boolExpTrans, boolExpDim)
+                                            , (expTrans,     expDim)
+                                            , (arrTrans,     arrDim)
+                                            , (eqSTrans,     eqSignDim)]
+    newArrBridgeSo   = arrowBridgeSo  {soGeometry = (arrTrans,     arrDim)}
     newBoolExpSo     = boolExpFoundSo {soGeometry = (boolExpTrans, boolExpDim)}
-    newEqSBridgeSo   = equalSignSo    {soGeometry = (eqSTrans, eqSignDim)}
-    newExpSo         = expFoundSo     {soGeometry = (expTrans, expDim)}
+    newEqSBridgeSo   = equalSignSo    {soGeometry = (eqSTrans,     eqSignDim)}
+    newExpSo         = expFoundSo     {soGeometry = (expTrans,     expDim)}
     geom             = (nullVector3, generalDim)
     arrBridgeSpec    = OsGuardedRhs newArrBridgeSo
     structObjects    = [newArrBridgeSo, newBoolExpSo, newEqSBridgeSo, newExpSo]
     in StructureObject arrBridgeSpec geom nullGraphObjSpec structObjects
 
-
-
+connectStructureObjects OsFramedGrhs (frBridgeSo : frameSo : grhsSo : []) = let
+    (OsGuardFrame outer inner)  = soObjectSpec frameSo
+    frameDim      @(GL.Vector3 fl  fh  fw)  = outer
+    frameInnerDim @(GL.Vector3 fil fih fiw) = inner
+    frBridgeDim   @(GL.Vector3 fbl fbh fbw) = geometryDim . soGeometry $ frBridgeSo
+    grhsDim       @(GL.Vector3 gl gh gw)    = geometryDim . soGeometry $ grhsSo
+    frBridgeTrans = nullVector3
+    frameTrans    = vector3 (fbl - (fl / 2)) ((fih - fh) / 2) ((fbw - fw) / 2)
+    grhsTrans     = vector3 fbl 0 0
+    generalDim    = generalizedDimension [ (frameTrans,    frameDim)
+                                         , (frBridgeTrans, frBridgeDim)
+                                         , (grhsTrans,     grhsDim)]
+    newFrBridgeSo = frBridgeSo {soGeometry = (frBridgeTrans, frBridgeDim)}
+    newFrameSo    = frameSo    {soGeometry = (frameTrans,    frameDim)}
+    newGhhsSo     = grhsSo     {soGeometry = (grhsTrans,     grhsDim)}
+    geom          = (nullVector3, generalDim)
+    structObjects = [newFrBridgeSo, newFrameSo, newGhhsSo]
+    in StructureObject OsFramedGrhs geom nullGraphObjSpec structObjects
 
 
 calcFoundationLikeParams funcSo expSo = let

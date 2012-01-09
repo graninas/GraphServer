@@ -57,28 +57,43 @@ constructExp (OcsApp (HsApp func exp)) = let
     funcSo = constructExp (OcsExpFuncName func expSo)
     in connectStructureObjects OsFunction [funcSo, expSo]
 
+constructFoundation :: ObjectConstructSpec -> StructureObject
 constructFoundation (OcsFoundationExp expSo) = let
     expSoDim     = geometryDim . soGeometry $ expSo
     dim          = derivedDimensions FoundationDimensions expSoDim
     graphObjSpec = foundationBox dim
     in StructureObject OsFoundation (nullVector3, dim) graphObjSpec []
 
-constructBridge osBridgeType = let
-    dim = vector3 2 0.25 2
-    graphObjSpec = case osBridgeType of
-                    OsArrowBridge     -> arrowBridgeBox     dim
-                    OsEqualSignBridge -> equalSignBridgeBox dim
-    in StructureObject osBridgeType (nullVector3, dim) graphObjSpec []
+constructBridge :: ObjectConstructSpec -> StructureObject
+constructBridge ocsBridgeType = let
+    dim          = vector3 2 0.25 2
+    (graphObjSpec, bType) = case ocsBridgeType of
+                    OcsArrowBridge     -> (arrowBridgeBox     dim, OsArrowBridge)
+                    OcsEqualSignBridge -> (equalSignBridgeBox dim, OsEqualSignBridge)
+    in StructureObject bType (nullVector3, dim) graphObjSpec []
 
---constructGuardFrame (StructureObject OsGuardedRhs )
+constructGuardFrame :: StructureObject
+constructGuardFrame = let
+    outerDim     = vector3 4 4 1
+    innerDim     = vector3 2 2 1
+    gFrameGoSpec = guardFrame outerDim innerDim
+    gFrameGeom   = (nullTranslation, outerDim)
+    in StructureObject (OsGuardFrame outerDim innerDim) gFrameGeom gFrameGoSpec []
 
+constructFramedGRhs :: StructureObject -> StructureObject
+constructFramedGRhs grhsSo = let
+    guardFrameSo   = constructGuardFrame
+    preFrameBridge = constructBridge OcsArrowBridge
+    in connectStructureObjects OsFramedGrhs [preFrameBridge, guardFrameSo, grhsSo]
+
+constructGuardedRhs :: ObjectConstructSpec -> StructureObject
 constructGuardedRhs (OcsGuardedRhs (HsGuardedRhs _ boolExp exp)) = let
     expSo                = constructExp (OcsExpArgument exp)
     boolExpSo            = constructExp (OcsExpArgument boolExp)
     expFoundationSo      = constructFoundation (OcsFoundationExp expSo)
     boolExpFoundationSo  = constructFoundation (OcsFoundationExp boolExpSo)
-    equalSignBridgeSo    = constructBridge      OsEqualSignBridge
-    arrowBridgeSo        = constructBridge      OsArrowBridge
+    equalSignBridgeSo    = constructBridge      OcsEqualSignBridge
+    arrowBridgeSo        = constructBridge      OcsArrowBridge
     expStructObjects     = [expFoundationSo, expSo]
     boolExpStructObjects = [boolExpFoundationSo, boolExpSo]
     expResSo             = connectStructureObjects OsExpFoundation expStructObjects
@@ -86,10 +101,8 @@ constructGuardedRhs (OcsGuardedRhs (HsGuardedRhs _ boolExp exp)) = let
     guargedRhsSoObjects  = [boolExpResSo, equalSignBridgeSo, expResSo]
     in connectStructureObjects (OsGuardedRhs arrowBridgeSo) guargedRhsSoObjects
 
-{-
-constructGuardedRhss (OcsGuardedRhss (HsGuardedRhss gRhss)) = let
-    constructedGrhss = map (constructGuardedRhs . OcsGuardedRhs)
-    framedGrhss      = map  constructGuardFrame constructedGrhss
-    in undefined
-    
-    -}
+constructFramedGRhss :: ObjectConstructSpec -> StructureObject
+constructFramedGRhss (OcsGuardedRhss (HsGuardedRhss rhss)) = let
+    guardedRhss = map (constructGuardedRhs . OcsGuardedRhs) rhss
+    framedGRhss = map constructFramedGRhs guardedRhss
+    in head framedGRhss
