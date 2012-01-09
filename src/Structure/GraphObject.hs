@@ -32,7 +32,7 @@ bridgeBox dim@(GL.Vector3 l h w) texName =
   where
       boxTexSpec = BoxTextureSpec texes defTex
       texes      = [(SideTop, QuadTexture texName)]
-      defTex     = QuadPlainColor colorWhite
+      defTex     = QuadTexture yellowBaseTex
 
 -- | Guard frame is graph object for '|' sing in guards.
 -- | ____________
