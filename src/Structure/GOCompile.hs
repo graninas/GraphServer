@@ -1,6 +1,7 @@
 module Structure.GOCompile
     (
         compileGraphObject
+    ,   compileGraphObjectSpec
     ) where
 
 import qualified Graphics.Rendering.OpenGL as GL
@@ -33,7 +34,15 @@ f texRes boxDim (side, qColorSpec) (sList, ioList) = let
                 GL.renderPrimitive GL.Quads (boxSide boxDim side)
     in (side : sList, boxIO : ioList) 
 
--- | Compiles GraphObject into action list structure, which is ready-to-eval. ([IO ()]) 
+compileGraphObjectSpec texRes (goTrans, _, go) = let
+    forwardTrans  = GL.translate goTrans
+    compiled      = compileGraphObject texRes go
+    backwardTrans = GL.translate . negateVector3 $ goTrans
+    in (forwardTrans : compiled) ++ [backwardTrans]
+
+-- | Compiles GraphObject into action list structure, which is ready-to-eval. ([IO ()])
+compileGraphObject :: PreparedTextureObjects -> GraphObject -> [IO()]
+compileGraphObject _ NoGraphObject = []
 compileGraphObject texRes (PrimitiveBox boxDim texName) =
     [do GL.color colorWhite
         GL.textureBinding GL.Texture2D GL.$= lookup texName texRes
@@ -47,4 +56,6 @@ compileGraphObject texRes (TexturedBox boxDim boxTexSpec) = let
     untextedSidesDraw = GL.renderPrimitive GL.Quads (boxSides boxDim untextedSides)
     in untextedQColor : untextedSidesDraw : textedSideDrawList
 
-compileGraphObject _ NoGraphObject = []
+compileGraphObject texRes (GraphObjects gObjectSpecs) =
+    concatMap (compileGraphObjectSpec texRes) gObjectSpecs
+    

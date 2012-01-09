@@ -63,17 +63,33 @@ constructFoundation (OcsFoundationExp expSo) = let
     graphObjSpec = foundationBox dim
     in StructureObject OsFoundation (nullVector3, dim) graphObjSpec []
 
-constructArrowBridge OsArrowBridge = let
+constructBridge osBridgeType = let
     dim = vector3 2 0.25 2
-    graphObjSpec = arrowBridgeBox dim
-    in StructureObject OsArrowBridge (nullVector3, dim) graphObjSpec []
+    graphObjSpec = case osBridgeType of
+                    OsArrowBridge     -> arrowBridgeBox     dim
+                    OsEqualSignBridge -> equalSignBridgeBox dim
+    in StructureObject osBridgeType (nullVector3, dim) graphObjSpec []
+
+--constructGuardFrame (StructureObject OsGuardedRhs )
 
 constructGuardedRhs (OcsGuardedRhs (HsGuardedRhs _ boolExp exp)) = let
-    expSo               = constructExp (OcsExpArgument exp)
-    boolExpSo           = constructExp (OcsExpArgument boolExp)
-    expFoundationSo     = constructFoundation (OcsFoundationExp expSo)
-    boolExpFoundationSo = constructFoundation (OcsFoundationExp boolExpSo)
-    expResSo            = connectStructureObjects OsExpFoundation [expFoundationSo,     expSo]
-    boolExpResSo        = connectStructureObjects OsExpFoundation [boolExpFoundationSo, boolExpSo]
-    arrowBridgeSo       = constructArrowBridge OsArrowBridge
-    in connectStructureObjects OsGuardedRhs [arrowBridgeSo, boolExpResSo, expResSo]
+    expSo                = constructExp (OcsExpArgument exp)
+    boolExpSo            = constructExp (OcsExpArgument boolExp)
+    expFoundationSo      = constructFoundation (OcsFoundationExp expSo)
+    boolExpFoundationSo  = constructFoundation (OcsFoundationExp boolExpSo)
+    equalSignBridgeSo    = constructBridge      OsEqualSignBridge
+    arrowBridgeSo        = constructBridge      OsArrowBridge
+    expStructObjects     = [expFoundationSo, expSo]
+    boolExpStructObjects = [boolExpFoundationSo, boolExpSo]
+    expResSo             = connectStructureObjects OsExpFoundation expStructObjects
+    boolExpResSo         = connectStructureObjects OsExpFoundation boolExpStructObjects
+    guargedRhsSoObjects  = [boolExpResSo, equalSignBridgeSo, expResSo]
+    in connectStructureObjects (OsGuardedRhs arrowBridgeSo) guargedRhsSoObjects
+
+{-
+constructGuardedRhss (OcsGuardedRhss (HsGuardedRhss gRhss)) = let
+    constructedGrhss = map (constructGuardedRhs . OcsGuardedRhs)
+    framedGrhss      = map  constructGuardFrame constructedGrhss
+    in undefined
+    
+    -}

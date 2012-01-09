@@ -25,7 +25,8 @@ data ObjectSpec = OsFunction
                 | OsFoundation
                 | OsExpFoundation
                 | OsArrowBridge
-                | OsGuardedRhs
+                | OsEqualSignBridge
+                | OsGuardedRhs StructureObject
     deriving (Show)
 
 data ObjectConstructSpec
@@ -35,3 +36,6 @@ data ObjectConstructSpec
                 | OcsInfixOperator HsQOp
                 | OcsGuardedRhs    HsGuardedRhs
                 | OcsFoundationExp StructureObject
+                | OcsGuardedRhss   HsRhs
+                
+                

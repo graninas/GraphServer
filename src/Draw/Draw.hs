@@ -19,12 +19,12 @@ draw ress@(GLResources texRes) n = do
     GL.loadIdentity
     GL.rotate 10 (vector3 0 1 0)
     GL.rotate 15 (vector3 1 0 0)
-    GL.translate (vector3 (-5) (-5) (-30))
+    GL.translate (vector3 (-5) (-5) (-20))
     --test ress
 
 
 
-    let c = constructGuardedRhs (OcsGuardedRhs t4)
+    let c = constructGuardedRhs (OcsGuardedRhs t5)
     putStrLn . show $ c
     render texRes c
     putStrLn " Ok."
