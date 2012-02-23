@@ -58,3 +58,12 @@ t5 = HsGuardedRhs (SrcLoc {srcFilename = "<unknown>", srcLine = 6, srcColumn = 9
                   (HsLit (HsInt 1))
 
 t6 = HsGuardedRhss [t4, t5]
+
+t7 = HsMatch (SrcLoc {srcFilename = "<unknown>", srcLine = 6, srcColumn = 1})
+             (HsIdent "fact'")
+             [HsPVar (HsIdent "n")]
+             t6
+             []
+{-
+ParseOk (HsModule (SrcLoc {srcFilename = "<unknown>", srcLine = 3, srcColumn = 1}) (Module "Main") (Just [HsEVar (UnQual (HsIdent "main"))]) [] [HsFunBind [HsMatch (SrcLoc {srcFilename = "<unknown>", srcLine = 3, srcColumn = 1}) (HsIdent "fact") [HsPLit (HsInt 0)] (HsUnGuardedRhs (HsLit (HsInt 1))) [],HsMatch (SrcLoc {srcFilename = "<unknown>", srcLine = 4, srcColumn = 1}) (HsIdent "fact") [HsPVar (HsIdent "n")] (HsUnGuardedRhs (HsInfixApp (HsApp (HsVar (UnQual (HsIdent "fact"))) (HsParen (HsInfixApp (HsVar (UnQual (HsIdent "n"))) (HsQVarOp (UnQual (HsSymbol "-"))) (HsLit (HsInt 1))))) (HsQVarOp (UnQual (HsSymbol "*"))) (HsVar (UnQual (HsIdent "n"))))) []],HsFunBind [HsMatch (SrcLoc {srcFilename = "<unknown>", srcLine = 6, srcColumn = 1}) (HsIdent "fact'") [HsPVar (HsIdent "n")] (HsGuardedRhss [HsGuardedRhs (SrcLoc {srcFilename = "<unknown>", srcLine = 6, srcColumn = 9}) (HsInfixApp (HsVar (UnQual (HsIdent "n"))) (HsQVarOp (UnQual (HsSymbol "=="))) (HsLit (HsInt 0))) (HsLit (HsInt 1)),HsGuardedRhs (SrcLoc {srcFilename = "<unknown>", srcLine = 7, srcColumn = 9}) (HsVar (UnQual (HsIdent "otherwise"))) (HsInfixApp (HsApp (HsVar (UnQual (HsIdent "fact'"))) (HsParen (HsInfixApp (HsVar (UnQual (HsIdent "n"))) (HsQVarOp (UnQual (HsSymbol "-"))) (HsLit (HsInt 1))))) (HsQVarOp (UnQual (HsSymbol "*"))) (HsVar (UnQual (HsIdent "n"))))]) []]])
+-}

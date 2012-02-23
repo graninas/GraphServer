@@ -42,5 +42,11 @@ data ObjectConstructSpec
                 | OcsGuardedRhss   HsRhs
                 | OcsArrowBridge
                 | OcsEqualSignBridge
+                | OcsMatch HsMatch
+                
+                -- Special for article
+                | OcsGeneralConnector StructureObject
+                | OcsFuncMatch HsName HsPat
+                
                 
                 

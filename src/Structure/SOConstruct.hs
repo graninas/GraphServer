@@ -88,8 +88,8 @@ constructFramedGRhs grhsSo = let
 
 constructGuardedRhs :: ObjectConstructSpec -> StructureObject
 constructGuardedRhs (OcsGuardedRhs (HsGuardedRhs _ boolExp exp)) = let
-    expSo                = constructExp (OcsExpArgument exp)
-    boolExpSo            = constructExp (OcsExpArgument boolExp)
+    expSo                = constructExp        (OcsExpArgument exp)
+    boolExpSo            = constructExp        (OcsExpArgument boolExp)
     expFoundationSo      = constructFoundation (OcsFoundationExp expSo)
     boolExpFoundationSo  = constructFoundation (OcsFoundationExp boolExpSo)
     equalSignBridgeSo    = constructBridge      OcsEqualSignBridge
@@ -106,3 +106,27 @@ constructFramedGRhss (OcsGuardedRhss (HsGuardedRhss rhss)) = let
     guardedRhss = map (constructGuardedRhs . OcsGuardedRhs) rhss
     framedGRhss = map constructFramedGRhs guardedRhss
     in connectStructureObjects OsFramedGrhss framedGRhss
+
+-- | constructMatch (and other function below) contains a special cases
+--  for function match construction. It should be rewritten after article printed.
+
+constructGeneralConnector (OcsGeneralConnector gRhssSo) = let
+    
+    
+    
+    in undefined
+
+constructFuncMatch (OcsFuncMatch funcHsName arg) = undefined
+
+constructMatch :: ObjectConstructSpec -> StructureObject
+constructMatch (OcsMatch (HsMatch _ funcHsName (arg:_) gRhss _)) = let
+    gRhssSo            = constructFramedGRhss      (OcsGuardedRhss      gRhss)
+    generalConnectorSo = constructGeneralConnector (OcsGeneralConnector gRhssSo)
+    funcMatchSo        = constructFuncMatch        (OcsFuncMatch        funcHsName arg)
+    funcFoundationSo   = constructFoundation       (OcsFoundationExp    funcMatchSo)
+    funcBridgeSo       = constructBridge            OcsArrowBridge
+    in gRhssSo
+
+
+
+

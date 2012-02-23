@@ -24,7 +24,9 @@ draw ress@(GLResources texRes) n = do
 
 
 
-    let c = constructFramedGRhss (OcsGuardedRhss t6)
+    --let c = constructFramedGRhss (OcsGuardedRhss t6)
+    let c = constructMatch (OcsMatch t7)
+    --let c = constructFramedGRhs (constructGuardedRhs (OcsGuardedRhs t4))
     putStrLn . show $ c
     render texRes c
     putStrLn " Ok."

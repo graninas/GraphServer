@@ -11,7 +11,6 @@ data GraphObject = NoGraphObject
                  | PrimitiveBox GLfVertex3 TextureName
                  | TexturedBox  GLfVertex3 ObjectTextureSpec
                  | GraphObjects [GraphObjectSpec]
-
   deriving (Show)
 
 type GraphObjectSpec = (Translation, Dimension, GraphObject)
