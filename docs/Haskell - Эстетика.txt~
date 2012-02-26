@@ -1,0 +1,456 @@
+﻿Я придумываю особенную игру в жанре космического симулятора. Согласно одной из ключевых концепций, в игре будет встроенный язык программирования, с помощью которого можно разрабатывать и улучшать алгоритмы взаимодействия игровых элементов. Дизайн такого языка - дело непростое, учитывая его "натуральность", а не "текстовость". То есть, конструкции языка выражены в виде разных графических объектов. Рисуя эскизы его конструкций, я неожиданно для себя отвлекся и вместо языка для игры стал придумывать язык для визуализации Haskell-кода. Получалось так интересно, что я не мог оставить эскизы просто бумажными рисунками. В январе 2012 года я начал писать сервер визуализации, и вот что получилось...
+
+===========(картинка визуализации многих и многих тел функции)==============
+
+Чтобы визуализировать что-либо, нужно сначала разобрать это на значимые единицы, а затем сопоставить им графические элементы. В случае с кодом такими единицами будут синтаксические элементы языка, стало быть, на первом шаге нам нужно разобрать код на абстрактное синтаксическое дерево (AST). Компилятор GHC умеет это делать лучше всего, и к нему даже есть биндинги, которые тем и занимаются. Scion - библиотека, позволяющая анализировать код через GHC API. Scion используется, например, в EclipseFP для подсветки синтаксиса и анализа ошибок "на лету". И он был бы хорош, если бы не его сложность, которая на ранних этапах разработки была ни к чему. Писать вручную синтаксический анализатор не хотелось. Любопытно, что нашелся еще один способ, простой и в то же время достаточный: библиотека Language.Haskell.
+
+Модуль Language.Haskell.Parser - это синтаксический анализатор чистого, без расширений, Haskell’98 кода (ну, почти без расширений). "Продвинутые" программы им не распарсишь, но в начале и самого Haskell’98 хватит за глаза. В качестве подопытного кролика я взял код вычисления факториала:
+
+fact' n | n == 0 = 1
+        | otherwise = fact' (n-1) * n
+
+Парсинг и анализ с помощью библиотеки делается элементарно, вот пример простой программы:
+
+import Language.Haskell.Parser
+
+main = do
+    s <- readFile "Fact.hs"
+    let parsed = parseModule s
+    putStrLn . show $ parsed
+
+Функция parseModule имеет следующий тип:
+
+parseModule :: String -> ParseResult HsModule
+
+где первым аргументом идет Haskell-код, а возвращается значение типа HsModule. Чтобы работать с типом HsModule, нужно подключить модуль Language.Haskell.Syntax. Его структура типов полностью описывает подмножество Haskell’98 в виде AST:
+
+ParseOk
+    (HsModule 
+        (SrcLoc {srcFilename = "<unknown>", srcLine = 3, srcColumn = 1}) 
+        (Module "Main") 
+        (Just [HsEVar (UnQual (HsIdent "main"))]) 
+        [] 
+        [HsFunBind 
+            [HsMatch 
+                (SrcLoc {srcFilename = "<unknown>", srcLine = 3, srcColumn = 1}) 
+                (HsIdent "fact'") 
+                [HsPVar (HsIdent "n")] 
+                (HsGuardedRhss 
+                    [HsGuardedRhs 
+                        (SrcLoc {srcFilename = "<unknown>", srcLine = 3, srcColumn = 9}) 
+                        (HsInfixApp 
+                            (HsVar (UnQual (HsIdent "n"))) 
+                            (HsQVarOp (UnQual (HsSymbol "=="))) 
+                            (HsLit (HsInt 0))) 
+                        (HsLit (HsInt 1))
+                    , HsGuardedRhs 
+                        (SrcLoc {srcFilename = "<unknown>", srcLine = 4, srcColumn = 9}) 
+                        (HsVar (UnQual (HsIdent "otherwise"))) 
+                        (HsInfixApp 
+                            (HsApp 
+                                (HsVar (UnQual (HsIdent "fact'"))) 
+                                (HsParen
+                                    (HsInfixApp 
+                                        (HsVar (UnQual (HsIdent "n"))) 
+                                        (HsQVarOp (UnQual (HsSymbol "-"))) 
+                                        (HsLit (HsInt 1))))) 
+                            (HsQVarOp (UnQual (HsSymbol "*"))) 
+                            (HsVar (UnQual (HsIdent "n"))))]) []]])
+
+В проекте GraphServer я разделил AST-дерево на составляющие, чтобы с ним было удобнее работать:
+
+t1 = HsInfixApp (HsVar    (UnQual (HsIdent "n")))
+                (HsQVarOp (UnQual (HsSymbol "-")))
+                (HsLit    (HsInt 1))
+
+t2 = HsApp (HsVar (UnQual (HsIdent "fact'")))
+           (HsParen t1)
+
+t3 = HsInfixApp t2
+                (HsQVarOp (UnQual (HsSymbol "*")))
+                (HsVar    (UnQual (HsIdent "n")))
+
+t4 = HsGuardedRhs (SrcLoc {srcFilename = "<unknown>", srcLine = 4, srcColumn = 9})
+                  (HsVar (UnQual (HsIdent "otherwise")))
+                  t3
+...
+
+Когда сервер будет работать в обычном режиме, на него можно будет отправить строку Haskell-кода, которая сервером парсится на AST и затем визуализируется. Сейчас же, в активной фазе разработки, сервер работает вхолостую. Я просто выбираю ту или иную "t-функцию" и запускаю весь процесс визуализации; но под кажущейся простотой скрываются разнообразные механизмы и алгоритмы, результат которых вы можете увидеть на картинке:
+
+===================(картинка - Визулизация2 - полная функция)==================
+
+Здесь представлены охранные выражения вместе с правыми частями функций:
+
+| n == 0 = 1
+| otherwise = fact' (n-1) * n
+
+Я хотел, чтобы графический язык отражал смысл синтаксических конструкций. Охранные выражения работают как "фильтры выполнения". Покажем интуитивность рамки мысленным экспериментом. Представим, что ход выполнения - это такой кубик, который может пройти через рамку к телу функции, а может и не пройти, - в зависимости от своих размеров ("логического условия"). Стрелки на картинке выше показывают ход выполнения. Что забавно, рамка, если глядеть на сцену спереди, превращается в ту самую вертикальную черту, которую мы видим в коде. Я пытался придумать, как будет выглядеть список, создаваемый оператором : внутри сопоставления с образцом, и пришел пока к варианту на картинках ниже. Первая соответствует выражению (x1:x2:xs), вторая - выражению (x1:_:[]). Вместо "неважного" элемента изображена плоская платформа, а пустой список - он и есть пустой. Условный оператор if и case-конструкция тоже в некоторой степени интуитивны. На бумаге у меня есть и другие черновые эскизы, но значительную часть Haskell-синтаксиса еще нужно разработать. Это касается и деклараций типов, и do-конструкции с ее особенностями, и паттерн-матчинга, и прочих важных вещей. А потом созданные эскизы нужно воплотить в коде...
+
+=====================(2 эскиза списков, эскизы if и case)======================
+
+Итак, стоит задача: по синтаксическим элементам сгенерировать элементы графические, как-то их позиционировать и объединить на одной сцене, а затем отрисовать ее. Как мы знаем, процесс, при котором один язык преобразовывается в другой, называется компиляцией. После нескольких неудачных проб я пришел к поэтапной компиляции, при которой код еще не превращается в кашу, и его можно дополнять. Вот эти этапы:
+
+I. Преобразование элемента AST в элемент StructureObject
+II. Сопоставление элементу StructureObject графического примитива
+III. Объединение и позиционирование StructureObject относительно друг друга
+IV. Компиляция графических примитивов в элементы сцены
+V. Отрисовка (рендеринг) сцены
+
+Прежде чем мы перейдем к реализации, рассмотрим модули, на которые разбит код сервера.
+
+GraphServer (Main) - главный модуль программы. Содержит функцию main, логику сервера; в нем же происходит инициализация OpenGL, создание окна и первичные настройки. Там же лежит главный цикл программы, и в нем крутится функция draw из модуля Draw.Draw.
+
+Common - общие данные и алгоритмы.
+Common.Constants - общие константы, настройки, фиксированные данные.
+Common.GLTypes - типы OpenGL (векторы, вершины и прочее), а также другие определения.
+Common.TestData - "t-функции", дополнительные данные для тестирования механизмов.
+Common.Units - функции по работе с единицами пространства, с OpenGL-векторами и вершинами.
+
+Structure - типы данных и алгоритмы по компиляции AST-дерева в StructureObject-дерево.
+Structure.Constants - константы и настройки, связанные с этапами I, II, III.
+Structure.StructureObject - описание центрального типа данных StructureObject.
+Structure.GraphObject - описание типа GraphObject и функции, создающие объект этого типа.
+Structure.Dimensions - работа с размерностями графических объектов.
+Structure.SOConstruct - создание StructureObject. Соответствует этапам I, II.
+Structure.SOConnect - соединение нескольких StructureObject. Соответствует этапу III.
+Structure.GOCompile - компиляция графических примитивов (GraphObject) в реальные объекты сцены. Соответствует этапу IV.
+Structure.HsSyntaxTools - вспомогательные функции для работы с AST.
+Structure.Texture - вспомогательные типы данных и функции для работы с текстурами.
+
+Draw - функции, отвечающие за рендеринг сцены.
+Draw.Draw - содержит функцию draw, в которой происходит компиляция и рендеринг сцены.
+Draw.GLInit - вспомогательные функции, предназначенные, как следует из названия, для инициализации OpenGL.
+Draw.Render - содержит функцию render. Соответствует этапу V.
+Draw.TextureInit - вспомогательные функции для создания текстур.
+
+Misc - прочие вспомогательные функции.
+Misc.BoxSide - функции из библиотеки HOpenGL, в которых создаются грани коробок.
+
+ThirdParty - сторонние утилиты и программы.
+ThirdParty.Frag - код из программы Frag. Загрузка TGA-файлов, создание текстур.
+ThirdParty.GLUtil - дополнительные утилиты по работе с OpenGL.
+ThirdParty.ImageFormats - загрузка TGA-файлов.
+
+============(эскиз инфиксного выражения)===========
+
+Я тестирую и обкатываю алгоритмы в упомянутой выше функции draw:
+
+draw :: DrawFunction
+draw GLResources texRes n = do
+    putStr $ "Current n = " ++ show n
+    GL.clear [GL.ColorBuffer, GL.DepthBuffer]
+    GL.loadIdentity
+    GL.rotate 10 (vector3 0 1 0)
+    GL.rotate 20 (vector3 1 0 0)
+    GL.translate (vector3 (-5) (-10) (-30))
+
+    -- Конструируем иерархию из StructureObject
+    let c = constructFramedGRhss (OcsGuardedRhss t6)
+
+    -- Компилируем элементы сцены из графических примитивов
+    -- и рисуем сцену
+    render texRes c
+    putStrLn "Ok."
+
+Функции constructFramedGRhss и render делают всю работу, и на выходе мы получаем картинки, что представлены в начале статьи. Функция constructFramedGRhss (и ее аналоги) из модуля Structure.SOConstruct реализует этапы I - III. У нее такой тип:
+
+constructFramedGRhss :: ObjectConstructSpec -> StructureObject
+
+Она принимает некую ObjectConstruct-спецификацию, а возвращает готовую иерархию из StructureObject. Спецификация - это всего лишь АТД, где прописано, с какой синтаксической единицей мы имеем дело:
+
+-- Модуль Structure.StructureObject
+data ObjectConstructSpec
+                = OcsApp HsExp
+                | OcsExpArgument   HsExp
+                | OcsExpFuncName   HsExp StructureObject
+                | OcsInfixOperator HsQOp
+                | OcsGuardedRhs    HsGuardedRhs
+                | OcsFoundationExp StructureObject
+                | OcsGuardedRhss   HsRhs
+                | OcsArrowBridge
+                | OcsEqualSignBridge
+                | OcsMatch HsMatch
+
+Тип данных StructureObject должен быть достаточно общим, чтобы описать любую возможную иерархическую структуру.
+
+-- Модуль Structure.StructureObject
+data StructureObject = StructureObject
+        { soObjectSpec       :: ObjectSpec
+        , soGeometry         :: Geometry
+        , soGraphObjectSpec  :: GraphObjectSpec
+        , soStructureObjects :: StructureObjects
+        } deriving (Show)
+
+type StructureObjects = [StructureObject]
+
+Как видно, поле soStructureObjects содержит список дочерних объектов. Фактически, иерархия AST преобразуется в иерархию StructureObject с накоплением необходимой для рендеринга информации: положение, размеры, графический примитив, текстуры. Дерево строится, начиная с самых нижних уровней, поскольку только так можно определить, где в пространстве должен быть расположен элемент вышележащего уровня. Данная схема налагает ограничение, что нельзя объектам StructureObject сразу же присвоить абсолютные координаты в пространстве сцены: двигаясь от дочерних объектов вверх, мы даже не можем представить, где окажется родительский элемент. Таким образом, все объекты StructureObject могут быть позиционированы только относительно своего родительского объекта; то есть, у каждого StructureObject есть свое смещение по осям OX, OY и OZ относительно нулевой точки родителя. Выглядит это так:
+
+======================(схема StructureObject)==========================
+
+На схеме условно изображены два StructureObject: белые панели соответствуют пространству родительского объекта, кирпичные панели - пространству дочернего. Сами по себе StructureObject’ы не отображаются на сцене, но считаются контейнерами для графических объектов (на схеме - синего цвета). Графические объекты позиционируются относительно нулевой точки содержащего их StructureObject. Габариты (размеры) StructureObject являются общими габаритами всех подструктур и нужны для расчетов в родительском элементе. Поле soGeometry имеет тип Geometry. Оно содержит общие смещение и габариты, заданные трехмерным вектором:
+
+-- Модуль Common.GLTypes
+type Geometry     = (Translation, Dimension)
+type GLfVector3   = GL.Vector3 GL.GLfloat
+type Translation  = GLfVector3
+type Dimension    = GLfVector3
+
+Аналогичные данные, а также графический объект содержит поле soGraphObjectSpec следующего типа:
+
+type GraphObjectSpec = (Translation, Dimension, GraphObject)
+
+Код создания StructureObject обширен и разбит на два модуля. Синтаксические элементы, простые и сложные, преобразуются в объекты StructureObject в модуле Structure.SOConstruct. Первоначально смещение Translation в поле soGeometry приравнивается к нулевому вектору. Мы просто не можем знать, как только что созданный StructureObject расположен относительно родителя, а родитель еще даже не существует, да и не обязательно появится в будущем. Смещение пересматривается позже, в том коде, который создает себе дочерний объект; либо оно просто остается нулевым, - тогда именно этот объект будет ориентиром для своих подобъектов. В коде ниже - создание трех простых объектов ("переменная", "платформа", "мост") и одного сложного (инфиксный оператор с аргументами):
+
+-- Конструируется объект для выражения-переменной:
+constructExp (OcsExpArgument (HsVar var)) = let
+    varText      = makeName . getHsQualName $ var
+    rawDim       = GL.Vector3 (hsNameLength varText) 2 2
+    dim          = derivedDimensions (FuncDimensions variableBoxDims) rawDim
+    graphObjSpec = variableBox varText dim
+    in StructureObject OsArgument (nullVector3, dim) graphObjSpec []
+
+-- Конструируется "платформа":
+constructFoundation :: ObjectConstructSpec -> StructureObject
+constructFoundation (OcsFoundationExp expSo) = let
+    expSoDim     = geometryDim . soGeometry $ expSo
+    dim          = derivedDimensions FoundationDimensions expSoDim
+    graphObjSpec = foundationBox dim
+    in StructureObject OsFoundation (nullVector3, dim) graphObjSpec []
+
+-- Конструируется "мост":
+constructBridge :: ObjectConstructSpec -> StructureObject
+constructBridge ocsBridgeType = let
+    dim          = vector3 2 0.25 2
+    (graphObjSpec, bType) = case ocsBridgeType of
+                    OcsArrowBridge     -> (arrowBridgeBox     dim, OsArrowBridge)
+                    OcsEqualSignBridge -> (equalSignBridgeBox dim, OsEqualSignBridge)
+    in StructureObject bType (nullVector3, dim) graphObjSpec []
+
+-- Конструируется сложный объект - инфиксный оператор с аргументами:
+constructExp (OcsExpArgument (HsInfixApp exp1 qOp exp2)) = let
+    exp1So = constructExp (OcsExpArgument   exp1)
+    qOpSo  = constructQOp (OcsInfixOperator qOp)
+    exp2So = constructExp (OcsExpArgument   exp2)
+    in connectStructureObjects OsInfixApp [exp1So, qOpSo, exp2So]
+
+Создавая сложный объект, мы должны как-то расположить его дочерние объекты. Понятно, что для разных синтаксических единиц будут разные положения. Нам нужно расчитать и присвоить объектам смещение относительно нуля. Родитель, являясь вновь созданным объектом, будет смещен на ноль (то есть, не смещен вообще), так как мы пока не знаем, насколько сдвигать и относительно чего это делать. Смещения расчитывает функция connectStructureObjects из модуля Structure.SOConnect. В нее передаются вид синтаксической единицы и список подобъектов, созданных ранее. Для каждого случая в функции connectStructureObjects есть свои варианты расчетов.
+
+connectStructureObjects :: ObjectSpec -> StructureObjects -> StructureObject
+
+-- Соединяются инфиксный оператор и два выражения:
+connectStructureObjects OsInfixApp (exp1So : opSo : exp2So : []) = let
+    exp1SoDim@(GL.Vector3 e1dl e1dh e1dw) = geometryDim . soGeometry $ exp1So
+    exp2SoDim                             = geometryDim . soGeometry $ exp2So
+    opSoDim  @(GL.Vector3 opdl opdh opdw) = geometryDim . soGeometry $ opSo
+    exp1Trans    = nullVector3               -- Выражение 1 начинается в нуле родителя
+    opTrans      = vector3  e1dl         0 0 -- Оператор сдвинут по OX на длину выражения 1 (находится рядом с ним)
+    exp2Trans    = vector3 (e1dl + opdl) 0 0 -- Выражение 2 сдвинуто по OY на длину выражения 1 и длину оператора
+    generalDim   = generalizedDimension [ (exp1Trans, exp1SoDim) -- Общие габариты родителя
+                                        , (exp2Trans, exp2SoDim)
+                                        , (opTrans, opSoDim)]
+    newOpGoSpec  = (opTrans, opSoDim, graphObjectFromSpec . soGraphObjectSpec $ opSo)
+    newExp1So    = exp1So {soGeometry = (exp1Trans, exp1SoDim)}
+    newExp2So    = exp2So {soGeometry = (exp2Trans, exp2SoDim)}
+    in StructureObject OsInfixApp (nullVector3, generalDim) newOpGoSpec [newExp1So, newExp2So]
+
+Представим себе пустое пространство, расчерченное координатными осями. В центре координат - ноль. Мысленно добавим на сцену небольшую коробку, смещенную вправо-вверх. Теперь добавим коробку другого размера, смещенную к нам и влево. Если обе эти коробки являются подобъектами какого-то родителя, то их края и ограничивают его пространство. На приведенной выше схеме StructureObject хорошо видно: пространство объекта определяется его содержимым. Но как посчитать суммарные габариты родителя? Мы должны учесть смещение и размер каждого подэлемента и найти общие минимумы, максимумы координат. Потом минимумы вычитаются из максимумов, и получаются общие размеры. Мы как бы проводим плоскости по самым крайним граням объектов, очерчивая искомое пространство. Этот алгоритм хорошо реализуется сверткой по списку смещений и размеров, а функция названа generalizedDimension.
+
+-- Модуль Structure.Dimensions
+generalizedDimension :: Geometries -> Dimension
+generalizedDimension (g:gs) = toDimension (foldr f g gs)
+  where
+    f ((GL.Vector3 dx1 dy1 dz1), (GL.Vector3 ax1 ay1 az1))
+      ((GL.Vector3 dx2 dy2 dz2), (GL.Vector3 ax2 ay2 az2)) =
+             (vector3 (min dx1 dx2) (min dy1 dy2) (min dz1 dz2),
+              vector3 (max (dx1 + ax1) (dx2 + ax2))
+                      (max (dy1 + ay1) (dy2 + ay2))
+                      (max (dz1 + az1) (dz2 + az2)))
+    toDimension ((GL.Vector3 x1 y1 z1), (GL.Vector3 x2 y2 z2)) =
+        vector3 (abs (x2 - x1)) (abs (y2 - y1)) (abs (z2 - z1))
+
+=============(эскиз функции с несколькими аргументами)===========
+
+Несмотря на громоздкость функций в модулях Structure.SOConstruct и Structure.SOConnect, я пока не придумал ничего лучше. Вероятно, есть какое-то декларативное решение, но вряд ли кода будет меньше. Существуют и особые случаи, которые трудно вписать в единую декларативную схему; так, согласно дизайну языка, функция выглядит как коробка в один юнит в высоту, а на ней располагаются ее аргументы. Отсюда следует, что для вычисления длины коробки нужно учитывать количество аргументов, их размеры и расстояние между ними. Выражение в графическом языке выглядит в виде пирамиды, а это значит, что, возникают дополнительные расчеты, связанные с выступами каждого нижележащего слоя. Обобщая данную задачу, я создал "механизм наследованных размеров", в котором ключевую роль играет derivedDimensions из модуля Structure.Dimensions. Она принимает исходные размеры элемента, размеры нужных дочерних элементов и алгоритм наследования, выраженный в виде функции высшего порядка, а возвращает новые, "наследованные" размеры. Ниже приведен упрощенный код из функции constructExp пред-пред-предыдущего листинга:
+
+let
+    rawDim = GL.Vector3 1 2 2
+    dim    = derivedDimensions (FuncDimensions variableBoxDims) rawDim
+...
+
+Здесь rawDim - исходный размер коробки для переменной, а dim - новые, "унаследованные" размеры. Конструктор данных FuncDimensions принадлежит специальному типу данных DerivedDimensions:
+
+-- Модуль Structure.Dimensions
+data DerivedDimensions = FuncDimensions (GLfVector3 -> GLfVector3)
+                       | FoundationDimensions
+
+Функция derivedDimensions и функции высшего порядка определяются следующим образом:
+
+-- Модуль Structure.Dimensions
+derivedDimensions :: DerivedDimensions -> GLfVector3 -> GLfVector3
+derivedDimensions (FuncDimensions f) dim = f dim
+derivedDimensions  FoundationDimensions (GL.Vector3 l h w) = vector3 (l + 2) 0.25 (w + 2)
+
+-- Functions to place into DerivedDimensions
+-- | Calculates function box dimensions according to it's argument dims
+funcBoxDerivedDims :: GLfVector3 -> GLfVector3 -> GLfVector3
+funcBoxDerivedDims (GL.Vector3 opl oph opw) (GL.Vector3 fBoxl fBoxh fBoxw) =
+    (GL.Vector3 (f opl fBoxh) fBoxh (max opw fBoxw))
+  where
+    f  op box | op >= box       = op + 1
+              | (box - op) <  1 = op + 1
+              | (box - op) >= 1 = box 
+
+-- | Calculates dims for variable box
+variableBoxDims :: GLfVector3 -> GLfVector3
+variableBoxDims (GL.Vector3 varl varh varw) =
+    (GL.Vector3 (if varl < 2 then 2 else varl) varh varw)
+
+Как видно, для конструктора FoundationDimensions в функции derivedDimensions задан простейший алгоритм, при котором исходные размеры просто изменяются на определенную величину. Длина и ширина увеличиваются на 2, а высота становится 0.25. Более сложные случаи реализовываются с помощью funcBoxDerivedDims и variableBoxDims. Например, dim из того упрощенного кода станет равным  GL.Vector3 2 2 2, потому что вычисление сведется к вызову variableBoxDims (GL.Vector3 1 2 2). При надобности можно написать и другие аналогичные функции. Для еще большей интуитивности графического языка я планирую в будущем добавить арность функций. Она будет выглядеть как пазы на коробке; пустые пазы соответствуют каррингу или сечению. Конечно, одного только механизма наследованных размеров будет мало, ведь для определения арности нужен более продвинутый анализ кода, чем простое разложение на синтаксис. Но это уже другая история...
+
+=============(эскиз каррированной функции с пазами и аргументами)===========
+
+Большой интерес представляет тип данных GraphObject - примитив, шаблон, заготовка, прообраз будущего элемента сцены. На начальных этапах компиляции нам не нужно в точности знать весь массив вершин примитива, проще сначала задать какую-то болванку, которая потом будет развернута уже в реальные вершины, линии, грани. Таким образом, мы абстрагируемся от графического представления и можем при надобности его модифицировать или даже заменить чем-то другим.
+
+-- Модуль Structure.GraphObjec
+data GraphObject = NoGraphObject
+                 | PrimitiveBox GLfVertex3 TextureName
+                 | TexturedBox  GLfVertex3 ObjectTextureSpec
+                 | GraphObjects [GraphObjectSpec]
+  deriving (Show)
+
+Легко заметить, что у объекта StructureObject может быть как много графических объектов (конструктор GraphObjects), так и не быть их вообще (конструктор NoGraphObject). И это понятно: в дереве AST, отображенном выше, для значения HsGuardedRhss нечего сопоставить графического. Это, скорее, будет контейнер для других объектов, а именно, для правых частей функции, содержащих охранные выражения (Rhss - "right hand sides"). В то же время "реальные" графические объекты пока представлены всего двумя элементами: примитивной коробкой PrimitiveBox и продвинутой коробкой TexturedBox. У обоих коробок есть значение типа GLfVertex3 - это просто размеры, по которым на этапе IV будут созданы текстурированные грани, шесть штук. У примитивной коробки текстура одна, а для TexturedBox возможно задать отдельную текстуру каждой грани. Тип ObjectTextureSpec устроен так:
+
+-- Модуль Structure.Texture
+data ObjectTextureSpec = BoxTextureSpec
+        { quadSideTexes  :: [(BoxSide, QuadColorSpec)]
+        , defQuadSideTex :: QuadColorSpec
+        } deriving (Show)
+
+data QuadColorSpec = QuadTexture TextureName
+                   | QuadPlainColor GLfColor4
+                   | NoQuadColorSpec
+    deriving (Show)
+
+-- Тип BoxSide описан в модуле Common.GLTypes.
+-- Легко догадаться, что он из себя представляет:
+data BoxSide = SideTop
+             | SideBottom
+             | SideLeft
+             | SideRight
+             | SideRear
+             | SideFront
+    deriving (Show, Eq)
+
+Хотите, чтобы на верхней грани была стрелка, а все остальные были текстурированы по умолчанию? Нет проблем!
+
+let texes      = [(SideTop, QuadTexture arrowTex)]
+    defaultTex = QuadTexture yellowBaseTex
+    boxTexSpec = BoxTextureSpec texes defaultTex
+
+Или только две грани с текстурами, а остальные - каким-нибудь цветом? И это можно.
+
+let texes      = [ (SideFront, QuadTexture arrowTex)
+                 , (SideRear,  QuadTexture arrowTex)]
+    defaultTex = QuadPlainColor (color3 1 0 0)
+    boxTexSpec = BoxTextureSpec texes defaultTex
+
+Элементы типа GraphObject строятся с помощью мнемонических функций во время создания StructureObject. Сейчас в модуле Structure.GraphObject имеются следующие функции: primitiveBox, variableBox, functionBox, foundationBox, arrowBridgeBox, equalSignBridgeBox, bridgeBox и guardFrame. Для примера приведу лишь несколько функций:
+
+-- Модуль Structure.GraphObject
+primitiveBox trans dim@(GL.Vector3 l h w) texName = (trans,       dim, PrimitiveBox (vertex3 l h w) texName)
+variableBox _      dim@(GL.Vector3 l h w)         = (nullVector3, dim, PrimitiveBox (vertex3 l h w) helloTex)
+
+arrowBridgeBox     dim = bridgeBox dim arrowTex
+equalSignBridgeBox dim = bridgeBox dim equalSignTex
+
+bridgeBox dim@(GL.Vector3 l h w) texName =
+    (nullVector3, dim, TexturedBox (vertex3 l h w) boxTexSpec)
+  where
+      boxTexSpec = BoxTextureSpec texes defTex
+      texes      = [(SideTop, QuadTexture texName)]
+      defTex     = QuadTexture yellowBaseTex
+
+======================(эскиз do...let)=======================
+
+Отдельно стоит рассказать о системе рендеринга. На данный момент я компилирую графические примитивы в объекты сцены и сразу же их рисую. Это происходит в функции render, которая в составе функции draw вечно крутится в цикле программы. Конечно, такой код неэффективен, ведь при компиляции одного и того же StructureObject-дерева получается одна и та же сцена с объектами, и можно было бы ее подготовить загодя. Никаких препятствий тут нет, к тому же рендеринг и компиляция легко разделяются, если возвращать список действий [IO()], а не выполнять на месте, как это сделано сейчас:
+
+-- Модуль Draw.Render
+render texRes (StructureObject _ (soTrans, _) goSpec objects) = do
+    GL.translate soTrans                   -- устанавливаем относительное смещение
+    mapM_ (render texRes) objects          -- рекурсивно спускаемся по дереву
+    sequence_ $ compileGraphObjectSpec texRes goSpec -- компилируем примитивы и выполняем OpenGL-вызовы
+    GL.translate . negateVector3 $ soTrans -- убираем относительное смещение
+
+Алгоритм рендеринга рекурсивен. Спускаясь по дереву от коренного StructureObject, мы выставляем все новые и новые смещения для дочерних элементов, а при возврате на предыдущий уровень эти смещения убираем. Функция compileGraphObjectSpec компилирует объект GraphObject в объект сцены. Функция sequence_ выполняет список действий [IO()]. У графических объектов тоже есть относительное смещение, поэтому делаем аналогиные переносы координат:
+
+-- Модуль Structure.GOCompile
+compileGraphObjectSpec texRes (goTrans, _, go) = let
+    forwardTrans  = GL.translate goTrans
+    compiled      = compileGraphObject texRes go
+    backwardTrans = GL.translate . negateVector3 $ goTrans
+    in (forwardTrans : compiled) ++ [backwardTrans]
+
+Вообще, код в модуле Structure.GOCompile весьма интересен применяемыми техниками (например, свертки и list comprehensions). Конечно, такой код труднее понять, но мне чудится в нем какая-то внутренняя красота и завершенность, ценная сама по себе:
+
+-- | Collects actions for specified box side drawings.
+-- | It should be used only in this module.
+f :: PreparedTextureObjects
+    -> GLfVertex3
+    -> (BoxSide, QuadColorSpec)
+    -> ([BoxSide], [IO()])
+    -> ([BoxSide], [IO()])
+f texRes boxDim (side, qColorSpec) (sList, ioList) = let
+    boxIO = do setQuadColorSpec texRes qColorSpec
+               GL.renderPrimitive GL.Quads (boxSide boxDim side)
+    in (side : sList, boxIO : ioList) 
+
+-- | Compiles GraphObject into action list structure, which is ready-to-eval. ([IO ()])
+compileGraphObject :: PreparedTextureObjects -> GraphObject -> [IO()]
+
+compileGraphObject _ NoGraphObject = []
+
+compileGraphObject texRes (GraphObjects gObjectSpecs) =
+    concatMap (compileGraphObjectSpec texRes) gObjectSpecs
+
+compileGraphObject texRes (PrimitiveBox boxDim texName) =
+    [do GL.color colorWhite
+        GL.textureBinding GL.Texture2D GL.$= lookup texName texRes
+        GL.renderPrimitive GL.Quads (allBoxSides boxDim)]
+
+compileGraphObject texRes (TexturedBox boxDim boxTexSpec) = let
+    (BoxTextureSpec sideTexes defTex) = boxTexSpec
+    (textedSides, textedSideDrawList) = foldr (f texRes boxDim) ([], []) sideTexes
+    untextedSides                     = [s | s <- boxSideList, s `notElem` textedSides]
+    untextedQColor                    = setQuadColorSpec texRes defTex
+    untextedSidesDraw                 = GL.renderPrimitive GL.Quads (boxSides boxDim untextedSides)
+    in untextedQColor : untextedSidesDraw : textedSideDrawList
+
+Коробки состоят из граней, а грани заливаются цветом или текстурой. В OpenGL какую-либо фигуру можно рисовать повершинно; в нашем случае это будут вершины четырехугольника. Вершины расчитываются из длины, высоты и ширины, содержащихся в dim, причем нулевая точка соответствует углу коробки слева-внизу-сзади (просто потому, что оси в системе координат OpenGL так направлены: OX - вправо, OY - вверх, OZ - на нас). Грани создаются в модуле Misc.BoxSide с помощью функций из библиотеки HOpenGL.
+
+boxSide :: GLfVertex3 -> BoxSide -> IO ()
+
+boxSide (GL.Vertex3 x y z) SideTop = do
+            GL.texCoord texCoordDR >> GL.vertex (vertex3 x y z)
+            GL.texCoord texCoordUR >> GL.vertex (vertex3 x y 0)
+            GL.texCoord texCoordUL >> GL.vertex (vertex3 0 y 0)
+            GL.texCoord texCoordDL >> GL.vertex (vertex3 0 y z)
+
+boxSide (GL.Vertex3 x y z) SideFront = do
+            GL.texCoord texCoordUR >> GL.vertex (vertex3 x y z)
+            GL.texCoord texCoordUL >> GL.vertex (vertex3 0 y z)
+            GL.texCoord texCoordDL >> GL.vertex (vertex3 0 0 z)
+            GL.texCoord texCoordDR >> GL.vertex (vertex3 x 0 z)
+
+-- ... и так далее для всех 6 граней.
+
+boxSideList = [SideTop, SideBottom, SideLeft, SideRight, SideRear, SideFront]
+boxSides    boxDim = mapM_ (boxSide boxDim)
+allBoxSides boxDim = boxSides boxDim boxSideList
+
+============(какой-нибудь эскиз)======================
+
+Что ж, мы довольно поверхностно проследили общую структуру программы GraphServer. Я не стану описывать, как устроена серверная часть программы, как загружаются картинки из файлов, как из картинок создаются текстуры, как используются сторонние утилиты. Работы еще очень много, сервер визуализации готов процентов на 10. Работа осложняется тем, что далеко не для всех элементов языка Haskell готовы эскизы. Есть трудности и с визуализацией, что очень хорошо заметно на скриншотах; все-таки, отладочные текстуры далеки от идеала. Хотелось бы нормировать растяжение текстур по объекту, украсить, создать что-то более гармоничное, поработать над дизайном. Еще нужны шрифты и рисование строк; в будущем добавится анализ функций на арность, а это очередной рефакторинг, другие подходы, иные методы. И опять потребуются тонкие техники, хитрые алгоритмы, умные структуры данных, которые сами по себе разработать ой как нелегко... Проект масштабный, глубокий и приносящий эстетическое удовольствие. Я приглашаю всех желающих присоединиться к нему: это и практика в Haskell, и опыт в проектировании больших программ, и знания в графике, и изучение алгоритмов. Но прежде всего, это искусство и творчество, - то, что делает нашу жизнь прекраснее.
+
+Код открыт и расположен на GitHub: https://github.com/graninas/GraphServer
+
+P.S. Просьба к читателям: если вам интересно вступить в проект, обращайтесь ко мне в личку, в аську или на почту. Почта на Гугле, ник такой же, как на Хабре. Если можете, пропиарьте статью среди других любителей Haskell, или среди тех, кто бы хотел его изучить, присоединившись к проекту. 

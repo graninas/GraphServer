@@ -6,74 +6,74 @@
 
 Модуль Language.Haskell.Parser - это синтаксический анализатор чистого, без расширений, Haskell’98 кода (ну, почти без расширений). "Продвинутые" программы им не распарсишь, но в начале и самого Haskell’98 хватит за глаза. В качестве подопытного кролика я взял код вычисления факториала:
 
-fact' n | n == 0 = 1
-        | otherwise = fact' (n-1) * n
+<blockquote>fact'&nbsp;n&nbsp;<font color="#339933">|</font>&nbsp;n&nbsp;<font color="#339933">==</font>&nbsp;<font>0</font>&nbsp;<font color="#339933">=</font>&nbsp;<font>1</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;<font>otherwise</font>&nbsp;<font color="#339933">=</font>&nbsp;fact'&nbsp;<font>&#40;</font>n<font color="#339933">-</font><font>1</font><font>&#41;</font>&nbsp;<font color="#339933">*</font>&nbsp;n</blockquote>
 
 Парсинг и анализ с помощью библиотеки делается элементарно, вот пример простой программы:
 
-import Language.Haskell.Parser
-
-main = do
-    s <- readFile "Fact.hs"
-    let parsed = parseModule s
-    putStrLn . show $ parsed
+<blockquote><font>import</font>&nbsp;Language<font color="#339933">.</font>Haskell<font color="#339933">.</font>Parser<br/>
+&nbsp;<br/>
+main&nbsp;<font color="#339933">=</font>&nbsp;<font>do</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;s&nbsp;<font color="#339933">&lt;-</font>&nbsp;<font>readFile</font>&nbsp;<font>&quot;Fact.hs&quot;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>let</font>&nbsp;parsed&nbsp;<font color="#339933">=</font>&nbsp;parseModule&nbsp;s<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>putStrLn</font>&nbsp;<font color="#339933">.</font>&nbsp;<font>show</font>&nbsp;<font color="#339933">$</font>&nbsp;parsed</blockquote>
 
 Функция parseModule имеет следующий тип:
 
-parseModule :: String -> ParseResult HsModule
+<blockquote>parseModule&nbsp;<font color="#339933">::</font>&nbsp;<font color="#cccc00">String</font>&nbsp;<font color="#339933">-&gt;</font>&nbsp;ParseResult&nbsp;HsModule</blockquote>
 
 где первым аргументом идет Haskell-код, а возвращается значение типа HsModule. Чтобы работать с типом HsModule, нужно подключить модуль Language.Haskell.Syntax. Его структура типов полностью описывает подмножество Haskell’98 в виде AST:
 
-ParseOk
-    (HsModule 
-        (SrcLoc {srcFilename = "<unknown>", srcLine = 3, srcColumn = 1}) 
-        (Module "Main") 
-        (Just [HsEVar (UnQual (HsIdent "main"))]) 
-        [] 
-        [HsFunBind 
-            [HsMatch 
-                (SrcLoc {srcFilename = "<unknown>", srcLine = 3, srcColumn = 1}) 
-                (HsIdent "fact'") 
-                [HsPVar (HsIdent "n")] 
-                (HsGuardedRhss 
-                    [HsGuardedRhs 
-                        (SrcLoc {srcFilename = "<unknown>", srcLine = 3, srcColumn = 9}) 
-                        (HsInfixApp 
-                            (HsVar (UnQual (HsIdent "n"))) 
-                            (HsQVarOp (UnQual (HsSymbol "=="))) 
-                            (HsLit (HsInt 0))) 
-                        (HsLit (HsInt 1))
-                    , HsGuardedRhs 
-                        (SrcLoc {srcFilename = "<unknown>", srcLine = 4, srcColumn = 9}) 
-                        (HsVar (UnQual (HsIdent "otherwise"))) 
-                        (HsInfixApp 
-                            (HsApp 
-                                (HsVar (UnQual (HsIdent "fact'"))) 
-                                (HsParen
-                                    (HsInfixApp 
-                                        (HsVar (UnQual (HsIdent "n"))) 
-                                        (HsQVarOp (UnQual (HsSymbol "-"))) 
-                                        (HsLit (HsInt 1))))) 
-                            (HsQVarOp (UnQual (HsSymbol "*"))) 
-                            (HsVar (UnQual (HsIdent "n"))))]) []]])
+<blockquote>ParseOk<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsModule&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>SrcLoc&nbsp;<font>&#123;</font>srcFilename&nbsp;<font color="#339933">=</font>&nbsp;<font>&quot;&lt;unknown&gt;&quot;</font><font color="#339933">,</font>&nbsp;srcLine&nbsp;<font color="#339933">=</font>&nbsp;<font>3</font><font color="#339933">,</font>&nbsp;srcColumn&nbsp;<font color="#339933">=</font>&nbsp;<font>1</font><font>&#125;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>Module&nbsp;<font>&quot;Main&quot;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>Just&nbsp;<font>&#91;</font>HsEVar&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsIdent&nbsp;<font>&quot;main&quot;</font><font>&#41;</font><font>&#41;</font><font>&#93;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#91;</font><font>&#93;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#91;</font>HsFunBind&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#91;</font>HsMatch&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>SrcLoc&nbsp;<font>&#123;</font>srcFilename&nbsp;<font color="#339933">=</font>&nbsp;<font>&quot;&lt;unknown&gt;&quot;</font><font color="#339933">,</font>&nbsp;srcLine&nbsp;<font color="#339933">=</font>&nbsp;<font>3</font><font color="#339933">,</font>&nbsp;srcColumn&nbsp;<font color="#339933">=</font>&nbsp;<font>1</font><font>&#125;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsIdent&nbsp;<font>&quot;fact'&quot;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#91;</font>HsPVar&nbsp;<font>&#40;</font>HsIdent&nbsp;<font>&quot;n&quot;</font><font>&#41;</font><font>&#93;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsGuardedRhss&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#91;</font>HsGuardedRhs&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>SrcLoc&nbsp;<font>&#123;</font>srcFilename&nbsp;<font color="#339933">=</font>&nbsp;<font>&quot;&lt;unknown&gt;&quot;</font><font color="#339933">,</font>&nbsp;srcLine&nbsp;<font color="#339933">=</font>&nbsp;<font>3</font><font color="#339933">,</font>&nbsp;srcColumn&nbsp;<font color="#339933">=</font>&nbsp;<font>9</font><font>&#125;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsInfixApp&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsVar&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsIdent&nbsp;<font>&quot;n&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsQVarOp&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsSymbol&nbsp;<font>&quot;==&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsLit&nbsp;<font>&#40;</font>HsInt&nbsp;<font>0</font><font>&#41;</font><font>&#41;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsLit&nbsp;<font>&#40;</font>HsInt&nbsp;<font>1</font><font>&#41;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">,</font>&nbsp;HsGuardedRhs&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>SrcLoc&nbsp;<font>&#123;</font>srcFilename&nbsp;<font color="#339933">=</font>&nbsp;<font>&quot;&lt;unknown&gt;&quot;</font><font color="#339933">,</font>&nbsp;srcLine&nbsp;<font color="#339933">=</font>&nbsp;<font>4</font><font color="#339933">,</font>&nbsp;srcColumn&nbsp;<font color="#339933">=</font>&nbsp;<font>9</font><font>&#125;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsVar&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsIdent&nbsp;<font>&quot;otherwise&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsInfixApp&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsApp&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsVar&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsIdent&nbsp;<font>&quot;fact'&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsParen<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsInfixApp&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsVar&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsIdent&nbsp;<font>&quot;n&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsQVarOp&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsSymbol&nbsp;<font>&quot;-&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsLit&nbsp;<font>&#40;</font>HsInt&nbsp;<font>1</font><font>&#41;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsQVarOp&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsSymbol&nbsp;<font>&quot;*&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font>&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsVar&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsIdent&nbsp;<font>&quot;n&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font><font>&#93;</font><font>&#41;</font>&nbsp;<font>&#91;</font><font>&#93;</font><font>&#93;</font><font>&#93;</font><font>&#41;</font></blockquote>
 
 В проекте GraphServer я разделил AST-дерево на составляющие, чтобы с ним было удобнее работать:
 
-t1 = HsInfixApp (HsVar    (UnQual (HsIdent "n")))
-                (HsQVarOp (UnQual (HsSymbol "-")))
-                (HsLit    (HsInt 1))
-
-t2 = HsApp (HsVar (UnQual (HsIdent "fact'")))
-           (HsParen t1)
-
-t3 = HsInfixApp t2
-                (HsQVarOp (UnQual (HsSymbol "*")))
-                (HsVar    (UnQual (HsIdent "n")))
-
-t4 = HsGuardedRhs (SrcLoc {srcFilename = "<unknown>", srcLine = 4, srcColumn = 9})
-                  (HsVar (UnQual (HsIdent "otherwise")))
-                  t3
-...
+<blockquote>t1&nbsp;<font color="#339933">=</font>&nbsp;HsInfixApp&nbsp;<font>&#40;</font>HsVar&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsIdent&nbsp;<font>&quot;n&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsQVarOp&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsSymbol&nbsp;<font>&quot;-&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsLit&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsInt&nbsp;<font>1</font><font>&#41;</font><font>&#41;</font><br/>
+&nbsp;<br/>
+t2&nbsp;<font color="#339933">=</font>&nbsp;HsApp&nbsp;<font>&#40;</font>HsVar&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsIdent&nbsp;<font>&quot;fact'&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsParen&nbsp;t1<font>&#41;</font><br/>
+&nbsp;<br/>
+t3&nbsp;<font color="#339933">=</font>&nbsp;HsInfixApp&nbsp;t2<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsQVarOp&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsSymbol&nbsp;<font>&quot;*&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsVar&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsIdent&nbsp;<font>&quot;n&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font><br/>
+&nbsp;<br/>
+t4&nbsp;<font color="#339933">=</font>&nbsp;HsGuardedRhs&nbsp;<font>&#40;</font>SrcLoc&nbsp;<font>&#123;</font>srcFilename&nbsp;<font color="#339933">=</font>&nbsp;<font>&quot;&lt;unknown&gt;&quot;</font><font color="#339933">,</font>&nbsp;srcLine&nbsp;<font color="#339933">=</font>&nbsp;<font>4</font><font color="#339933">,</font>&nbsp;srcColumn&nbsp;<font color="#339933">=</font>&nbsp;<font>9</font><font>&#125;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>HsVar&nbsp;<font>&#40;</font>UnQual&nbsp;<font>&#40;</font>HsIdent&nbsp;<font>&quot;otherwise&quot;</font><font>&#41;</font><font>&#41;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t3<br/>
+<font color="#339933">...</font></blockquote>
 
 Когда сервер будет работать в обычном режиме, на него можно будет отправить строку Haskell-кода, которая сервером парсится на AST и затем визуализируется. Сейчас же, в активной фазе разработки, сервер работает вхолостую. Я просто выбираю ту или иную "t-функцию" и запускаю весь процесс визуализации; но под кажущейся простотой скрываются разнообразные механизмы и алгоритмы, результат которых вы можете увидеть на картинке:
 
@@ -81,8 +81,8 @@ t4 = HsGuardedRhs (SrcLoc {srcFilename = "<unknown>", srcLine = 4, srcColumn = 9
 
 Здесь представлены охранные выражения вместе с правыми частями функций:
 
-| n == 0 = 1
-| otherwise = fact' (n-1) * n
+<blockquote><font color="#339933">|</font>&nbsp;n&nbsp;<font color="#339933">==</font>&nbsp;<font>0</font>&nbsp;<font color="#339933">=</font>&nbsp;<font>1</font><br/>
+<font color="#339933">|</font>&nbsp;<font>otherwise</font>&nbsp;<font color="#339933">=</font>&nbsp;fact'&nbsp;<font>&#40;</font>n<font color="#339933">-</font><font>1</font><font>&#41;</font>&nbsp;<font color="#339933">*</font>&nbsp;n</blockquote>
 
 Я хотел, чтобы графический язык отражал смысл синтаксических конструкций. Охранные выражения работают как "фильтры выполнения". Покажем интуитивность рамки мысленным экспериментом. Представим, что ход выполнения - это такой кубик, который может пройти через рамку к телу функции, а может и не пройти, - в зависимости от своих размеров ("логического условия"). Стрелки на картинке выше показывают ход выполнения. Что забавно, рамка, если глядеть на сцену спереди, превращается в ту самую вертикальную черту, которую мы видим в коде. Я пытался придумать, как будет выглядеть список, создаваемый оператором : внутри сопоставления с образцом, и пришел пока к варианту на картинках ниже. Первая соответствует выражению (x1:x2:xs), вторая - выражению (x1:_:[]). Вместо "неважного" элемента изображена плоская платформа, а пустой список - он и есть пустой. Условный оператор if и case-конструкция тоже в некоторой степени интуитивны. На бумаге у меня есть и другие черновые эскизы, но значительную часть Haskell-синтаксиса еще нужно разработать. Это касается и деклараций типов, и do-конструкции с ее особенностями, и паттерн-матчинга, и прочих важных вещей. А потом созданные эскизы нужно воплотить в коде...
 
@@ -135,53 +135,53 @@ ThirdParty.ImageFormats - загрузка TGA-файлов.
 
 Я тестирую и обкатываю алгоритмы в упомянутой выше функции draw:
 
-draw :: DrawFunction
-draw GLResources texRes n = do
-    putStr $ "Current n = " ++ show n
-    GL.clear [GL.ColorBuffer, GL.DepthBuffer]
-    GL.loadIdentity
-    GL.rotate 10 (vector3 0 1 0)
-    GL.rotate 20 (vector3 1 0 0)
-    GL.translate (vector3 (-5) (-10) (-30))
-
-    -- Конструируем иерархию из StructureObject
-    let c = constructFramedGRhss (OcsGuardedRhss t6)
-
-    -- Компилируем элементы сцены из графических примитивов
-    -- и рисуем сцену
-    render texRes c
-    putStrLn "Ok."
+<blockquote>draw&nbsp;<font color="#339933">::</font>&nbsp;DrawFunction<br/>
+draw&nbsp;GLResources&nbsp;texRes&nbsp;n&nbsp;<font color="#339933">=</font>&nbsp;<font>do</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>putStr</font>&nbsp;<font color="#339933">$</font>&nbsp;<font>&quot;Current&nbsp;n&nbsp;=&nbsp;&quot;</font>&nbsp;<font color="#339933">++</font>&nbsp;<font>show</font>&nbsp;n<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>clear&nbsp;<font>&#91;</font>GL<font color="#339933">.</font>ColorBuffer<font color="#339933">,</font>&nbsp;GL<font color="#339933">.</font>DepthBuffer<font>&#93;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>loadIdentity<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>rotate&nbsp;<font>10</font>&nbsp;<font>&#40;</font>vector3&nbsp;<font>0</font>&nbsp;<font>1</font>&nbsp;<font>0</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>rotate&nbsp;<font>20</font>&nbsp;<font>&#40;</font>vector3&nbsp;<font>1</font>&nbsp;<font>0</font>&nbsp;<font>0</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>translate&nbsp;<font>&#40;</font>vector3&nbsp;<font>&#40;</font><font color="#339933">-</font><font>5</font><font>&#41;</font>&nbsp;<font>&#40;</font><font color="#339933">-</font><font>10</font><font>&#41;</font>&nbsp;<font>&#40;</font><font color="#339933">-</font><font>30</font><font>&#41;</font><font>&#41;</font><br/>
+&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5d478b">--&nbsp;Конструируем&nbsp;иерархию&nbsp;из&nbsp;StructureObject</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>let</font>&nbsp;c&nbsp;<font color="#339933">=</font>&nbsp;constructFramedGRhss&nbsp;<font>&#40;</font>OcsGuardedRhss&nbsp;t6<font>&#41;</font><br/>
+&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5d478b">--&nbsp;Компилируем&nbsp;элементы&nbsp;сцены&nbsp;из&nbsp;графических&nbsp;примитивов</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5d478b">--&nbsp;и&nbsp;рисуем&nbsp;сцену</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;render&nbsp;texRes&nbsp;c<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>putStrLn</font>&nbsp;<font>&quot;Ok.&quot;</font></blockquote>
 
 Функции constructFramedGRhss и render делают всю работу, и на выходе мы получаем картинки, что представлены в начале статьи. Функция constructFramedGRhss (и ее аналоги) из модуля Structure.SOConstruct реализует этапы I - III. У нее такой тип:
 
-constructFramedGRhss :: ObjectConstructSpec -> StructureObject
+<blockquote>constructFramedGRhss&nbsp;<font color="#339933">::</font>&nbsp;ObjectConstructSpec&nbsp;<font color="#339933">-&gt;</font>&nbsp;StructureObject</blockquote>
 
 Она принимает некую ObjectConstruct-спецификацию, а возвращает готовую иерархию из StructureObject. Спецификация - это всего лишь АТД, где прописано, с какой синтаксической единицей мы имеем дело:
 
--- Модуль Structure.StructureObject
-data ObjectConstructSpec
-                = OcsApp HsExp
-                | OcsExpArgument   HsExp
-                | OcsExpFuncName   HsExp StructureObject
-                | OcsInfixOperator HsQOp
-                | OcsGuardedRhs    HsGuardedRhs
-                | OcsFoundationExp StructureObject
-                | OcsGuardedRhss   HsRhs
-                | OcsArrowBridge
-                | OcsEqualSignBridge
-                | OcsMatch HsMatch
+<blockquote><font color="#5d478b">--&nbsp;Модуль&nbsp;Structure.StructureObject</font><br/>
+<font>data</font>&nbsp;ObjectConstructSpec<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;OcsApp&nbsp;HsExp<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;OcsExpArgument&nbsp;&nbsp;&nbsp;HsExp<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;OcsExpFuncName&nbsp;&nbsp;&nbsp;HsExp&nbsp;StructureObject<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;OcsInfixOperator&nbsp;HsQOp<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;OcsGuardedRhs&nbsp;&nbsp;&nbsp;&nbsp;HsGuardedRhs<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;OcsFoundationExp&nbsp;StructureObject<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;OcsGuardedRhss&nbsp;&nbsp;&nbsp;HsRhs<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;OcsArrowBridge<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;OcsEqualSignBridge<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;OcsMatch&nbsp;HsMatch</blockquote>
 
 Тип данных StructureObject должен быть достаточно общим, чтобы описать любую возможную иерархическую структуру.
 
--- Модуль Structure.StructureObject
-data StructureObject = StructureObject
-        { soObjectSpec       :: ObjectSpec
-        , soGeometry         :: Geometry
-        , soGraphObjectSpec  :: GraphObjectSpec
-        , soStructureObjects :: StructureObjects
-        } deriving (Show)
-
-type StructureObjects = [StructureObject]
+<blockquote><font color="#5d478b">--&nbsp;Модуль&nbsp;Structure.StructureObject</font><br/>
+<font>data</font>&nbsp;StructureObject&nbsp;<font color="#339933">=</font>&nbsp;StructureObject<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#123;</font>&nbsp;soObjectSpec&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">::</font>&nbsp;ObjectSpec<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">,</font>&nbsp;soGeometry&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">::</font>&nbsp;Geometry<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">,</font>&nbsp;soGraphObjectSpec&nbsp;&nbsp;<font color="#339933">::</font>&nbsp;GraphObjectSpec<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">,</font>&nbsp;soStructureObjects&nbsp;<font color="#339933">::</font>&nbsp;StructureObjects<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#125;</font>&nbsp;<font>deriving</font>&nbsp;<font>&#40;</font><font color="#cccc00">Show</font><font>&#41;</font><br/>
+&nbsp;<br/>
+<font>type</font>&nbsp;StructureObjects&nbsp;<font color="#339933">=</font>&nbsp;<font>&#91;</font>StructureObject<font>&#93;</font></blockquote>
 
 Как видно, поле soStructureObjects содержит список дочерних объектов. Фактически, иерархия AST преобразуется в иерархию StructureObject с накоплением необходимой для рендеринга информации: положение, размеры, графический примитив, текстуры. Дерево строится, начиная с самых нижних уровней, поскольку только так можно определить, где в пространстве должен быть расположен элемент вышележащего уровня. Данная схема налагает ограничение, что нельзя объектам StructureObject сразу же присвоить абсолютные координаты в пространстве сцены: двигаясь от дочерних объектов вверх, мы даже не можем представить, где окажется родительский элемент. Таким образом, все объекты StructureObject могут быть позиционированы только относительно своего родительского объекта; то есть, у каждого StructureObject есть свое смещение по осям OX, OY и OZ относительно нулевой точки родителя. Выглядит это так:
 
@@ -189,121 +189,121 @@ type StructureObjects = [StructureObject]
 
 На схеме условно изображены два StructureObject: белые панели соответствуют пространству родительского объекта, кирпичные панели - пространству дочернего. Сами по себе StructureObject’ы не отображаются на сцене, но считаются контейнерами для графических объектов (на схеме - синего цвета). Графические объекты позиционируются относительно нулевой точки содержащего их StructureObject. Габариты (размеры) StructureObject являются общими габаритами всех подструктур и нужны для расчетов в родительском элементе. Поле soGeometry имеет тип Geometry. Оно содержит общие смещение и габариты, заданные трехмерным вектором:
 
--- Модуль Common.GLTypes
-type Geometry     = (Translation, Dimension)
-type GLfVector3   = GL.Vector3 GL.GLfloat
-type Translation  = GLfVector3
-type Dimension    = GLfVector3
+<blockquote><font color="#5d478b">--&nbsp;Модуль&nbsp;Common.GLTypes</font><br/>
+<font>type</font>&nbsp;Geometry&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;<font>&#40;</font>Translation<font color="#339933">,</font>&nbsp;Dimension<font>&#41;</font><br/>
+<font>type</font>&nbsp;GLfVector3&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;GL<font color="#339933">.</font>Vector3&nbsp;GL<font color="#339933">.</font>GLfloat<br/>
+<font>type</font>&nbsp;Translation&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;GLfVector3<br/>
+<font>type</font>&nbsp;Dimension&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;GLfVector3</blockquote>
 
 Аналогичные данные, а также графический объект содержит поле soGraphObjectSpec следующего типа:
 
-type GraphObjectSpec = (Translation, Dimension, GraphObject)
+<blockquote><font>type</font>&nbsp;GraphObjectSpec&nbsp;<font color="#339933">=</font>&nbsp;<font>&#40;</font>Translation<font color="#339933">,</font>&nbsp;Dimension<font color="#339933">,</font>&nbsp;GraphObject<font>&#41;</font></blockquote>
 
 Код создания StructureObject обширен и разбит на два модуля. Синтаксические элементы, простые и сложные, преобразуются в объекты StructureObject в модуле Structure.SOConstruct. Первоначально смещение Translation в поле soGeometry приравнивается к нулевому вектору. Мы просто не можем знать, как только что созданный StructureObject расположен относительно родителя, а родитель еще даже не существует, да и не обязательно появится в будущем. Смещение пересматривается позже, в том коде, который создает себе дочерний объект; либо оно просто остается нулевым, - тогда именно этот объект будет ориентиром для своих подобъектов. В коде ниже - создание трех простых объектов ("переменная", "платформа", "мост") и одного сложного (инфиксный оператор с аргументами):
 
--- Конструируется объект для выражения-переменной:
-constructExp (OcsExpArgument (HsVar var)) = let
-    varText      = makeName . getHsQualName $ var
-    rawDim       = GL.Vector3 (hsNameLength varText) 2 2
-    dim          = derivedDimensions (FuncDimensions variableBoxDims) rawDim
-    graphObjSpec = variableBox varText dim
-    in StructureObject OsArgument (nullVector3, dim) graphObjSpec []
-
--- Конструируется "платформа":
-constructFoundation :: ObjectConstructSpec -> StructureObject
-constructFoundation (OcsFoundationExp expSo) = let
-    expSoDim     = geometryDim . soGeometry $ expSo
-    dim          = derivedDimensions FoundationDimensions expSoDim
-    graphObjSpec = foundationBox dim
-    in StructureObject OsFoundation (nullVector3, dim) graphObjSpec []
-
--- Конструируется "мост":
-constructBridge :: ObjectConstructSpec -> StructureObject
-constructBridge ocsBridgeType = let
-    dim          = vector3 2 0.25 2
-    (graphObjSpec, bType) = case ocsBridgeType of
-                    OcsArrowBridge     -> (arrowBridgeBox     dim, OsArrowBridge)
-                    OcsEqualSignBridge -> (equalSignBridgeBox dim, OsEqualSignBridge)
-    in StructureObject bType (nullVector3, dim) graphObjSpec []
-
--- Конструируется сложный объект - инфиксный оператор с аргументами:
-constructExp (OcsExpArgument (HsInfixApp exp1 qOp exp2)) = let
-    exp1So = constructExp (OcsExpArgument   exp1)
-    qOpSo  = constructQOp (OcsInfixOperator qOp)
-    exp2So = constructExp (OcsExpArgument   exp2)
-    in connectStructureObjects OsInfixApp [exp1So, qOpSo, exp2So]
+<blockquote><font color="#5d478b">--&nbsp;Конструируется&nbsp;объект&nbsp;для&nbsp;выражения-переменной:</font><br/>
+constructExp&nbsp;<font>&#40;</font>OcsExpArgument&nbsp;<font>&#40;</font>HsVar&nbsp;var<font>&#41;</font><font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;<font>let</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;varText&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;makeName&nbsp;<font color="#339933">.</font>&nbsp;getHsQualName&nbsp;<font color="#339933">$</font>&nbsp;var<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;rawDim&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;GL<font color="#339933">.</font>Vector3&nbsp;<font>&#40;</font>hsNameLength&nbsp;varText<font>&#41;</font>&nbsp;<font>2</font>&nbsp;<font>2</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;dim&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;derivedDimensions&nbsp;<font>&#40;</font>FuncDimensions&nbsp;variableBoxDims<font>&#41;</font>&nbsp;rawDim<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;graphObjSpec&nbsp;<font color="#339933">=</font>&nbsp;variableBox&nbsp;varText&nbsp;dim<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>in</font>&nbsp;StructureObject&nbsp;OsArgument&nbsp;<font>&#40;</font>nullVector3<font color="#339933">,</font>&nbsp;dim<font>&#41;</font>&nbsp;graphObjSpec&nbsp;<font>&#91;</font><font>&#93;</font><br/>
+&nbsp;<br/>
+<font color="#5d478b">--&nbsp;Конструируется&nbsp;&quot;платформа&quot;:</font><br/>
+constructFoundation&nbsp;<font color="#339933">::</font>&nbsp;ObjectConstructSpec&nbsp;<font color="#339933">-&gt;</font>&nbsp;StructureObject<br/>
+constructFoundation&nbsp;<font>&#40;</font>OcsFoundationExp&nbsp;expSo<font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;<font>let</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;expSoDim&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;geometryDim&nbsp;<font color="#339933">.</font>&nbsp;soGeometry&nbsp;<font color="#339933">$</font>&nbsp;expSo<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;dim&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;derivedDimensions&nbsp;FoundationDimensions&nbsp;expSoDim<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;graphObjSpec&nbsp;<font color="#339933">=</font>&nbsp;foundationBox&nbsp;dim<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>in</font>&nbsp;StructureObject&nbsp;OsFoundation&nbsp;<font>&#40;</font>nullVector3<font color="#339933">,</font>&nbsp;dim<font>&#41;</font>&nbsp;graphObjSpec&nbsp;<font>&#91;</font><font>&#93;</font><br/>
+&nbsp;<br/>
+<font color="#5d478b">--&nbsp;Конструируется&nbsp;&quot;мост&quot;:</font><br/>
+constructBridge&nbsp;<font color="#339933">::</font>&nbsp;ObjectConstructSpec&nbsp;<font color="#339933">-&gt;</font>&nbsp;StructureObject<br/>
+constructBridge&nbsp;ocsBridgeType&nbsp;<font color="#339933">=</font>&nbsp;<font>let</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;dim&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;vector3&nbsp;<font>2</font>&nbsp;<font>0.25</font>&nbsp;<font>2</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>graphObjSpec<font color="#339933">,</font>&nbsp;bType<font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;<font>case</font>&nbsp;ocsBridgeType&nbsp;<font>of</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OcsArrowBridge&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">-&gt;</font>&nbsp;<font>&#40;</font>arrowBridgeBox&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dim<font color="#339933">,</font>&nbsp;OsArrowBridge<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OcsEqualSignBridge&nbsp;<font color="#339933">-&gt;</font>&nbsp;<font>&#40;</font>equalSignBridgeBox&nbsp;dim<font color="#339933">,</font>&nbsp;OsEqualSignBridge<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>in</font>&nbsp;StructureObject&nbsp;bType&nbsp;<font>&#40;</font>nullVector3<font color="#339933">,</font>&nbsp;dim<font>&#41;</font>&nbsp;graphObjSpec&nbsp;<font>&#91;</font><font>&#93;</font><br/>
+&nbsp;<br/>
+<font color="#5d478b">--&nbsp;Конструируется&nbsp;сложный&nbsp;объект&nbsp;-&nbsp;инфиксный&nbsp;оператор&nbsp;с&nbsp;аргументами:</font><br/>
+constructExp&nbsp;<font>&#40;</font>OcsExpArgument&nbsp;<font>&#40;</font>HsInfixApp&nbsp;exp1&nbsp;qOp&nbsp;exp2<font>&#41;</font><font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;<font>let</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;exp1So&nbsp;<font color="#339933">=</font>&nbsp;constructExp&nbsp;<font>&#40;</font>OcsExpArgument&nbsp;&nbsp;&nbsp;exp1<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;qOpSo&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;constructQOp&nbsp;<font>&#40;</font>OcsInfixOperator&nbsp;qOp<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;exp2So&nbsp;<font color="#339933">=</font>&nbsp;constructExp&nbsp;<font>&#40;</font>OcsExpArgument&nbsp;&nbsp;&nbsp;exp2<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>in</font>&nbsp;connectStructureObjects&nbsp;OsInfixApp&nbsp;<font>&#91;</font>exp1So<font color="#339933">,</font>&nbsp;qOpSo<font color="#339933">,</font>&nbsp;exp2So<font>&#93;</font></blockquote>
 
 Создавая сложный объект, мы должны как-то расположить его дочерние объекты. Понятно, что для разных синтаксических единиц будут разные положения. Нам нужно расчитать и присвоить объектам смещение относительно нуля. Родитель, являясь вновь созданным объектом, будет смещен на ноль (то есть, не смещен вообще), так как мы пока не знаем, насколько сдвигать и относительно чего это делать. Смещения расчитывает функция connectStructureObjects из модуля Structure.SOConnect. В нее передаются вид синтаксической единицы и список подобъектов, созданных ранее. Для каждого случая в функции connectStructureObjects есть свои варианты расчетов.
 
-connectStructureObjects :: ObjectSpec -> StructureObjects -> StructureObject
-
--- Соединяются инфиксный оператор и два выражения:
-connectStructureObjects OsInfixApp (exp1So : opSo : exp2So : []) = let
-    exp1SoDim@(GL.Vector3 e1dl e1dh e1dw) = geometryDim . soGeometry $ exp1So
-    exp2SoDim                             = geometryDim . soGeometry $ exp2So
-    opSoDim  @(GL.Vector3 opdl opdh opdw) = geometryDim . soGeometry $ opSo
-    exp1Trans    = nullVector3               -- Выражение 1 начинается в нуле родителя
-    opTrans      = vector3  e1dl         0 0 -- Оператор сдвинут по OX на длину выражения 1 (находится рядом с ним)
-    exp2Trans    = vector3 (e1dl + opdl) 0 0 -- Выражение 2 сдвинуто по OY на длину выражения 1 и длину оператора
-    generalDim   = generalizedDimension [ (exp1Trans, exp1SoDim) -- Общие габариты родителя
-                                        , (exp2Trans, exp2SoDim)
-                                        , (opTrans, opSoDim)]
-    newOpGoSpec  = (opTrans, opSoDim, graphObjectFromSpec . soGraphObjectSpec $ opSo)
-    newExp1So    = exp1So {soGeometry = (exp1Trans, exp1SoDim)}
-    newExp2So    = exp2So {soGeometry = (exp2Trans, exp2SoDim)}
-    in StructureObject OsInfixApp (nullVector3, generalDim) newOpGoSpec [newExp1So, newExp2So]
+<blockquote>connectStructureObjects&nbsp;<font color="#339933">::</font>&nbsp;ObjectSpec&nbsp;<font color="#339933">-&gt;</font>&nbsp;StructureObjects&nbsp;<font color="#339933">-&gt;</font>&nbsp;StructureObject<br/>
+&nbsp;<br/>
+<font color="#5d478b">--&nbsp;Соединяются&nbsp;инфиксный&nbsp;оператор&nbsp;и&nbsp;два&nbsp;выражения:</font><br/>
+connectStructureObjects&nbsp;OsInfixApp&nbsp;<font>&#40;</font>exp1So&nbsp;:&nbsp;opSo&nbsp;:&nbsp;exp2So&nbsp;:&nbsp;<font>&#91;</font><font>&#93;</font><font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;<font>let</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;exp1SoDim<font color="#339933">@</font><font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;e1dl&nbsp;e1dh&nbsp;e1dw<font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;geometryDim&nbsp;<font color="#339933">.</font>&nbsp;soGeometry&nbsp;<font color="#339933">$</font>&nbsp;exp1So<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;exp2SoDim&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;geometryDim&nbsp;<font color="#339933">.</font>&nbsp;soGeometry&nbsp;<font color="#339933">$</font>&nbsp;exp2So<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;opSoDim&nbsp;&nbsp;<font color="#339933">@</font><font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;opdl&nbsp;opdh&nbsp;opdw<font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;geometryDim&nbsp;<font color="#339933">.</font>&nbsp;soGeometry&nbsp;<font color="#339933">$</font>&nbsp;opSo<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;exp1Trans&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;nullVector3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5d478b">--&nbsp;Выражение&nbsp;1&nbsp;начинается&nbsp;в&nbsp;нуле&nbsp;родителя</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;opTrans&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;vector3&nbsp;&nbsp;e1dl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>0</font>&nbsp;<font>0</font>&nbsp;<font color="#5d478b">--&nbsp;Оператор&nbsp;сдвинут&nbsp;по&nbsp;OX&nbsp;на&nbsp;длину&nbsp;выражения&nbsp;1&nbsp;(находится&nbsp;рядом&nbsp;с&nbsp;ним)</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;exp2Trans&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;vector3&nbsp;<font>&#40;</font>e1dl&nbsp;<font color="#339933">+</font>&nbsp;opdl<font>&#41;</font>&nbsp;<font>0</font>&nbsp;<font>0</font>&nbsp;<font color="#5d478b">--&nbsp;Выражение&nbsp;2&nbsp;сдвинуто&nbsp;по&nbsp;OY&nbsp;на&nbsp;длину&nbsp;выражения&nbsp;1&nbsp;и&nbsp;длину&nbsp;оператора</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;generalDim&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;generalizedDimension&nbsp;<font>&#91;</font>&nbsp;<font>&#40;</font>exp1Trans<font color="#339933">,</font>&nbsp;exp1SoDim<font>&#41;</font>&nbsp;<font color="#5d478b">--&nbsp;Общие&nbsp;габариты&nbsp;родителя</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">,</font>&nbsp;<font>&#40;</font>exp2Trans<font color="#339933">,</font>&nbsp;exp2SoDim<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">,</font>&nbsp;<font>&#40;</font>opTrans<font color="#339933">,</font>&nbsp;opSoDim<font>&#41;</font><font>&#93;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;newOpGoSpec&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;<font>&#40;</font>opTrans<font color="#339933">,</font>&nbsp;opSoDim<font color="#339933">,</font>&nbsp;graphObjectFromSpec&nbsp;<font color="#339933">.</font>&nbsp;soGraphObjectSpec&nbsp;<font color="#339933">$</font>&nbsp;opSo<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;newExp1So&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;exp1So&nbsp;<font>&#123;</font>soGeometry&nbsp;<font color="#339933">=</font>&nbsp;<font>&#40;</font>exp1Trans<font color="#339933">,</font>&nbsp;exp1SoDim<font>&#41;</font><font>&#125;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;newExp2So&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;exp2So&nbsp;<font>&#123;</font>soGeometry&nbsp;<font color="#339933">=</font>&nbsp;<font>&#40;</font>exp2Trans<font color="#339933">,</font>&nbsp;exp2SoDim<font>&#41;</font><font>&#125;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>in</font>&nbsp;StructureObject&nbsp;OsInfixApp&nbsp;<font>&#40;</font>nullVector3<font color="#339933">,</font>&nbsp;generalDim<font>&#41;</font>&nbsp;newOpGoSpec&nbsp;<font>&#91;</font>newExp1So<font color="#339933">,</font>&nbsp;newExp2So<font>&#93;</font></blockquote>
 
 Представим себе пустое пространство, расчерченное координатными осями. В центре координат - ноль. Мысленно добавим на сцену небольшую коробку, смещенную вправо-вверх. Теперь добавим коробку другого размера, смещенную к нам и влево. Если обе эти коробки являются подобъектами какого-то родителя, то их края и ограничивают его пространство. На приведенной выше схеме StructureObject хорошо видно: пространство объекта определяется его содержимым. Но как посчитать суммарные габариты родителя? Мы должны учесть смещение и размер каждого подэлемента и найти общие минимумы, максимумы координат. Потом минимумы вычитаются из максимумов, и получаются общие размеры. Мы как бы проводим плоскости по самым крайним граням объектов, очерчивая искомое пространство. Этот алгоритм хорошо реализуется сверткой по списку смещений и размеров, а функция названа generalizedDimension.
 
--- Модуль Structure.Dimensions
-generalizedDimension :: Geometries -> Dimension
-generalizedDimension (g:gs) = toDimension (foldr f g gs)
-  where
-    f ((GL.Vector3 dx1 dy1 dz1), (GL.Vector3 ax1 ay1 az1))
-      ((GL.Vector3 dx2 dy2 dz2), (GL.Vector3 ax2 ay2 az2)) =
-             (vector3 (min dx1 dx2) (min dy1 dy2) (min dz1 dz2),
-              vector3 (max (dx1 + ax1) (dx2 + ax2))
-                      (max (dy1 + ay1) (dy2 + ay2))
-                      (max (dz1 + az1) (dz2 + az2)))
-    toDimension ((GL.Vector3 x1 y1 z1), (GL.Vector3 x2 y2 z2)) =
-        vector3 (abs (x2 - x1)) (abs (y2 - y1)) (abs (z2 - z1))
+<blockquote><font color="#5d478b">--&nbsp;Модуль&nbsp;Structure.Dimensions</font><br/>
+generalizedDimension&nbsp;<font color="#339933">::</font>&nbsp;Geometries&nbsp;<font color="#339933">-&gt;</font>&nbsp;Dimension<br/>
+generalizedDimension&nbsp;<font>&#40;</font>g:gs<font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;toDimension&nbsp;<font>&#40;</font><font>foldr</font>&nbsp;f&nbsp;g&nbsp;gs<font>&#41;</font><br/>
+&nbsp;&nbsp;<font>where</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f&nbsp;<font>&#40;</font><font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;dx1&nbsp;dy1&nbsp;dz1<font>&#41;</font><font color="#339933">,</font>&nbsp;<font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;ax1&nbsp;ay1&nbsp;az1<font>&#41;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font><font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;dx2&nbsp;dy2&nbsp;dz2<font>&#41;</font><font color="#339933">,</font>&nbsp;<font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;ax2&nbsp;ay2&nbsp;az2<font>&#41;</font><font>&#41;</font>&nbsp;<font color="#339933">=</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>vector3&nbsp;<font>&#40;</font><font>min</font>&nbsp;dx1&nbsp;dx2<font>&#41;</font>&nbsp;<font>&#40;</font><font>min</font>&nbsp;dy1&nbsp;dy2<font>&#41;</font>&nbsp;<font>&#40;</font><font>min</font>&nbsp;dz1&nbsp;dz2<font>&#41;</font><font color="#339933">,</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vector3&nbsp;<font>&#40;</font><font>max</font>&nbsp;<font>&#40;</font>dx1&nbsp;<font color="#339933">+</font>&nbsp;ax1<font>&#41;</font>&nbsp;<font>&#40;</font>dx2&nbsp;<font color="#339933">+</font>&nbsp;ax2<font>&#41;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font><font>max</font>&nbsp;<font>&#40;</font>dy1&nbsp;<font color="#339933">+</font>&nbsp;ay1<font>&#41;</font>&nbsp;<font>&#40;</font>dy2&nbsp;<font color="#339933">+</font>&nbsp;ay2<font>&#41;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font><font>max</font>&nbsp;<font>&#40;</font>dz1&nbsp;<font color="#339933">+</font>&nbsp;az1<font>&#41;</font>&nbsp;<font>&#40;</font>dz2&nbsp;<font color="#339933">+</font>&nbsp;az2<font>&#41;</font><font>&#41;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;toDimension&nbsp;<font>&#40;</font><font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;x1&nbsp;y1&nbsp;z1<font>&#41;</font><font color="#339933">,</font>&nbsp;<font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;x2&nbsp;y2&nbsp;z2<font>&#41;</font><font>&#41;</font>&nbsp;<font color="#339933">=</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vector3&nbsp;<font>&#40;</font><font>abs</font>&nbsp;<font>&#40;</font>x2&nbsp;<font color="#339933">-</font>&nbsp;x1<font>&#41;</font><font>&#41;</font>&nbsp;<font>&#40;</font><font>abs</font>&nbsp;<font>&#40;</font>y2&nbsp;<font color="#339933">-</font>&nbsp;y1<font>&#41;</font><font>&#41;</font>&nbsp;<font>&#40;</font><font>abs</font>&nbsp;<font>&#40;</font>z2&nbsp;<font color="#339933">-</font>&nbsp;z1<font>&#41;</font><font>&#41;</font></blockquote>
 
 =============(эскиз функции с несколькими аргументами)===========
 
 Несмотря на громоздкость функций в модулях Structure.SOConstruct и Structure.SOConnect, я пока не придумал ничего лучше. Вероятно, есть какое-то декларативное решение, но вряд ли кода будет меньше. Существуют и особые случаи, которые трудно вписать в единую декларативную схему; так, согласно дизайну языка, функция выглядит как коробка в один юнит в высоту, а на ней располагаются ее аргументы. Отсюда следует, что для вычисления длины коробки нужно учитывать количество аргументов, их размеры и расстояние между ними. Выражение в графическом языке выглядит в виде пирамиды, а это значит, что, возникают дополнительные расчеты, связанные с выступами каждого нижележащего слоя. Обобщая данную задачу, я создал "механизм наследованных размеров", в котором ключевую роль играет derivedDimensions из модуля Structure.Dimensions. Она принимает исходные размеры элемента, размеры нужных дочерних элементов и алгоритм наследования, выраженный в виде функции высшего порядка, а возвращает новые, "наследованные" размеры. Ниже приведен упрощенный код из функции constructExp пред-пред-предыдущего листинга:
 
-let
-    rawDim = GL.Vector3 1 2 2
-    dim    = derivedDimensions (FuncDimensions variableBoxDims) rawDim
-...
+<blockquote><font>let</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;rawDim&nbsp;<font color="#339933">=</font>&nbsp;GL<font color="#339933">.</font>Vector3&nbsp;<font>1</font>&nbsp;<font>2</font>&nbsp;<font>2</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;dim&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;derivedDimensions&nbsp;<font>&#40;</font>FuncDimensions&nbsp;variableBoxDims<font>&#41;</font>&nbsp;rawDim<br/>
+<font color="#339933">...</font></blockquote>
 
 Здесь rawDim - исходный размер коробки для переменной, а dim - новые, "унаследованные" размеры. Конструктор данных FuncDimensions принадлежит специальному типу данных DerivedDimensions:
 
--- Модуль Structure.Dimensions
-data DerivedDimensions = FuncDimensions (GLfVector3 -> GLfVector3)
-                       | FoundationDimensions
+<blockquote><font color="#5d478b">--&nbsp;Модуль&nbsp;Structure.Dimensions</font><br/>
+<font>data</font>&nbsp;DerivedDimensions&nbsp;<font color="#339933">=</font>&nbsp;FuncDimensions&nbsp;<font>&#40;</font>GLfVector3&nbsp;<font color="#339933">-&gt;</font>&nbsp;GLfVector3<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;FoundationDimensions</blockquote>
 
 Функция derivedDimensions и функции высшего порядка определяются следующим образом:
 
--- Модуль Structure.Dimensions
-derivedDimensions :: DerivedDimensions -> GLfVector3 -> GLfVector3
-derivedDimensions (FuncDimensions f) dim = f dim
-derivedDimensions  FoundationDimensions (GL.Vector3 l h w) = vector3 (l + 2) 0.25 (w + 2)
-
--- Functions to place into DerivedDimensions
--- | Calculates function box dimensions according to it's argument dims
-funcBoxDerivedDims :: GLfVector3 -> GLfVector3 -> GLfVector3
-funcBoxDerivedDims (GL.Vector3 opl oph opw) (GL.Vector3 fBoxl fBoxh fBoxw) =
-    (GL.Vector3 (f opl fBoxh) fBoxh (max opw fBoxw))
-  where
-    f  op box | op >= box       = op + 1
-              | (box - op) <  1 = op + 1
-              | (box - op) >= 1 = box 
-
--- | Calculates dims for variable box
-variableBoxDims :: GLfVector3 -> GLfVector3
-variableBoxDims (GL.Vector3 varl varh varw) =
-    (GL.Vector3 (if varl < 2 then 2 else varl) varh varw)
+<blockquote><font color="#5d478b">--&nbsp;Модуль&nbsp;Structure.Dimensions</font><br/>
+derivedDimensions&nbsp;<font color="#339933">::</font>&nbsp;DerivedDimensions&nbsp;<font color="#339933">-&gt;</font>&nbsp;GLfVector3&nbsp;<font color="#339933">-&gt;</font>&nbsp;GLfVector3<br/>
+derivedDimensions&nbsp;<font>&#40;</font>FuncDimensions&nbsp;f<font>&#41;</font>&nbsp;dim&nbsp;<font color="#339933">=</font>&nbsp;f&nbsp;dim<br/>
+derivedDimensions&nbsp;&nbsp;FoundationDimensions&nbsp;<font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;l&nbsp;h&nbsp;w<font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;vector3&nbsp;<font>&#40;</font>l&nbsp;<font color="#339933">+</font>&nbsp;<font>2</font><font>&#41;</font>&nbsp;<font>0.25</font>&nbsp;<font>&#40;</font>w&nbsp;<font color="#339933">+</font>&nbsp;<font>2</font><font>&#41;</font><br/>
+&nbsp;<br/>
+<font color="#5d478b">--&nbsp;Functions&nbsp;to&nbsp;place&nbsp;into&nbsp;DerivedDimensions</font><br/>
+<font color="#5d478b">--&nbsp;|&nbsp;Calculates&nbsp;function&nbsp;box&nbsp;dimensions&nbsp;according&nbsp;to&nbsp;it's&nbsp;argument&nbsp;dims</font><br/>
+funcBoxDerivedDims&nbsp;<font color="#339933">::</font>&nbsp;GLfVector3&nbsp;<font color="#339933">-&gt;</font>&nbsp;GLfVector3&nbsp;<font color="#339933">-&gt;</font>&nbsp;GLfVector3<br/>
+funcBoxDerivedDims&nbsp;<font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;opl&nbsp;oph&nbsp;opw<font>&#41;</font>&nbsp;<font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;fBoxl&nbsp;fBoxh&nbsp;fBoxw<font>&#41;</font>&nbsp;<font color="#339933">=</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;<font>&#40;</font>f&nbsp;opl&nbsp;fBoxh<font>&#41;</font>&nbsp;fBoxh&nbsp;<font>&#40;</font><font>max</font>&nbsp;opw&nbsp;fBoxw<font>&#41;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;<font>where</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;f&nbsp;&nbsp;op&nbsp;box&nbsp;<font color="#339933">|</font>&nbsp;op&nbsp;<font color="#339933">&gt;=</font>&nbsp;box&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;op&nbsp;<font color="#339933">+</font>&nbsp;<font>1</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;<font>&#40;</font>box&nbsp;<font color="#339933">-</font>&nbsp;op<font>&#41;</font>&nbsp;<font color="#339933">&lt;</font>&nbsp;&nbsp;<font>1</font>&nbsp;<font color="#339933">=</font>&nbsp;op&nbsp;<font color="#339933">+</font>&nbsp;<font>1</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;<font>&#40;</font>box&nbsp;<font color="#339933">-</font>&nbsp;op<font>&#41;</font>&nbsp;<font color="#339933">&gt;=</font>&nbsp;<font>1</font>&nbsp;<font color="#339933">=</font>&nbsp;box&nbsp;<br/>
+&nbsp;<br/>
+<font color="#5d478b">--&nbsp;|&nbsp;Calculates&nbsp;dims&nbsp;for&nbsp;variable&nbsp;box</font><br/>
+variableBoxDims&nbsp;<font color="#339933">::</font>&nbsp;GLfVector3&nbsp;<font color="#339933">-&gt;</font>&nbsp;GLfVector3<br/>
+variableBoxDims&nbsp;<font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;varl&nbsp;varh&nbsp;varw<font>&#41;</font>&nbsp;<font color="#339933">=</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;<font>&#40;</font><font>if</font>&nbsp;varl&nbsp;<font color="#339933">&lt;</font>&nbsp;<font>2</font>&nbsp;<font>then</font>&nbsp;<font>2</font>&nbsp;<font>else</font>&nbsp;varl<font>&#41;</font>&nbsp;varh&nbsp;varw<font>&#41;</font></blockquote>
 
 Как видно, для конструктора FoundationDimensions в функции derivedDimensions задан простейший алгоритм, при котором исходные размеры просто изменяются на определенную величину. Длина и ширина увеличиваются на 2, а высота становится 0.25. Более сложные случаи реализовываются с помощью funcBoxDerivedDims и variableBoxDims. Например, dim из того упрощенного кода станет равным  GL.Vector3 2 2 2, потому что вычисление сведется к вызову variableBoxDims (GL.Vector3 1 2 2). При надобности можно написать и другие аналогичные функции. Для еще большей интуитивности графического языка я планирую в будущем добавить арность функций. Она будет выглядеть как пазы на коробке; пустые пазы соответствуют каррингу или сечению. Конечно, одного только механизма наследованных размеров будет мало, ведь для определения арности нужен более продвинутый анализ кода, чем простое разложение на синтаксис. Но это уже другая история...
 
@@ -311,141 +311,141 @@ variableBoxDims (GL.Vector3 varl varh varw) =
 
 Большой интерес представляет тип данных GraphObject - примитив, шаблон, заготовка, прообраз будущего элемента сцены. На начальных этапах компиляции нам не нужно в точности знать весь массив вершин примитива, проще сначала задать какую-то болванку, которая потом будет развернута уже в реальные вершины, линии, грани. Таким образом, мы абстрагируемся от графического представления и можем при надобности его модифицировать или даже заменить чем-то другим.
 
--- Модуль Structure.GraphObjec
-data GraphObject = NoGraphObject
-                 | PrimitiveBox GLfVertex3 TextureName
-                 | TexturedBox  GLfVertex3 ObjectTextureSpec
-                 | GraphObjects [GraphObjectSpec]
-  deriving (Show)
+<blockquote><font color="#5d478b">--&nbsp;Модуль&nbsp;Structure.GraphObjec</font><br/>
+<font>data</font>&nbsp;GraphObject&nbsp;<font color="#339933">=</font>&nbsp;NoGraphObject<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;PrimitiveBox&nbsp;GLfVertex3&nbsp;TextureName<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;TexturedBox&nbsp;&nbsp;GLfVertex3&nbsp;ObjectTextureSpec<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;GraphObjects&nbsp;<font>&#91;</font>GraphObjectSpec<font>&#93;</font><br/>
+&nbsp;&nbsp;<font>deriving</font>&nbsp;<font>&#40;</font><font color="#cccc00">Show</font><font>&#41;</font></blockquote>
 
 Легко заметить, что у объекта StructureObject может быть как много графических объектов (конструктор GraphObjects), так и не быть их вообще (конструктор NoGraphObject). И это понятно: в дереве AST, отображенном выше, для значения HsGuardedRhss нечего сопоставить графического. Это, скорее, будет контейнер для других объектов, а именно, для правых частей функции, содержащих охранные выражения (Rhss - "right hand sides"). В то же время "реальные" графические объекты пока представлены всего двумя элементами: примитивной коробкой PrimitiveBox и продвинутой коробкой TexturedBox. У обоих коробок есть значение типа GLfVertex3 - это просто размеры, по которым на этапе IV будут созданы текстурированные грани, шесть штук. У примитивной коробки текстура одна, а для TexturedBox возможно задать отдельную текстуру каждой грани. Тип ObjectTextureSpec устроен так:
 
--- Модуль Structure.Texture
-data ObjectTextureSpec = BoxTextureSpec
-        { quadSideTexes  :: [(BoxSide, QuadColorSpec)]
-        , defQuadSideTex :: QuadColorSpec
-        } deriving (Show)
-
-data QuadColorSpec = QuadTexture TextureName
-                   | QuadPlainColor GLfColor4
-                   | NoQuadColorSpec
-    deriving (Show)
-
--- Тип BoxSide описан в модуле Common.GLTypes.
--- Легко догадаться, что он из себя представляет:
-data BoxSide = SideTop
-             | SideBottom
-             | SideLeft
-             | SideRight
-             | SideRear
-             | SideFront
-    deriving (Show, Eq)
+<blockquote><font color="#5d478b">--&nbsp;Модуль&nbsp;Structure.Texture</font><br/>
+<font>data</font>&nbsp;ObjectTextureSpec&nbsp;<font color="#339933">=</font>&nbsp;BoxTextureSpec<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#123;</font>&nbsp;quadSideTexes&nbsp;&nbsp;<font color="#339933">::</font>&nbsp;<font>&#91;</font><font>&#40;</font>BoxSide<font color="#339933">,</font>&nbsp;QuadColorSpec<font>&#41;</font><font>&#93;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">,</font>&nbsp;defQuadSideTex&nbsp;<font color="#339933">::</font>&nbsp;QuadColorSpec<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font>&#125;</font>&nbsp;<font>deriving</font>&nbsp;<font>&#40;</font><font color="#cccc00">Show</font><font>&#41;</font><br/>
+&nbsp;<br/>
+<font>data</font>&nbsp;QuadColorSpec&nbsp;<font color="#339933">=</font>&nbsp;QuadTexture&nbsp;TextureName<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;QuadPlainColor&nbsp;GLfColor4<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;NoQuadColorSpec<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>deriving</font>&nbsp;<font>&#40;</font><font color="#cccc00">Show</font><font>&#41;</font><br/>
+&nbsp;<br/>
+<font color="#5d478b">--&nbsp;Тип&nbsp;BoxSide&nbsp;описан&nbsp;в&nbsp;модуле&nbsp;Common.GLTypes.</font><br/>
+<font color="#5d478b">--&nbsp;Легко&nbsp;догадаться,&nbsp;что&nbsp;он&nbsp;из&nbsp;себя&nbsp;представляет:</font><br/>
+<font>data</font>&nbsp;BoxSide&nbsp;<font color="#339933">=</font>&nbsp;SideTop<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;SideBottom<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;SideLeft<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;SideRight<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;SideRear<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">|</font>&nbsp;SideFront<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>deriving</font>&nbsp;<font>&#40;</font><font color="#cccc00">Show</font><font color="#339933">,</font>&nbsp;<font color="#cccc00">Eq</font><font>&#41;</font></blockquote>
 
 Хотите, чтобы на верхней грани была стрелка, а все остальные были текстурированы по умолчанию? Нет проблем!
 
-let texes      = [(SideTop, QuadTexture arrowTex)]
-    defaultTex = QuadTexture yellowBaseTex
-    boxTexSpec = BoxTextureSpec texes defaultTex
+<blockquote><font>let</font>&nbsp;texes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;<font>&#91;</font><font>&#40;</font>SideTop<font color="#339933">,</font>&nbsp;QuadTexture&nbsp;arrowTex<font>&#41;</font><font>&#93;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;defaultTex&nbsp;<font color="#339933">=</font>&nbsp;QuadTexture&nbsp;yellowBaseTex<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;boxTexSpec&nbsp;<font color="#339933">=</font>&nbsp;BoxTextureSpec&nbsp;texes&nbsp;defaultTex</blockquote>
 
 Или только две грани с текстурами, а остальные - каким-нибудь цветом? И это можно.
 
-let texes      = [ (SideFront, QuadTexture arrowTex)
-                 , (SideRear,  QuadTexture arrowTex)]
-    defaultTex = QuadPlainColor (color3 1 0 0)
-    boxTexSpec = BoxTextureSpec texes defaultTex
+<blockquote><font>let</font>&nbsp;texes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;<font>&#91;</font>&nbsp;<font>&#40;</font>SideFront<font color="#339933">,</font>&nbsp;QuadTexture&nbsp;arrowTex<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">,</font>&nbsp;<font>&#40;</font>SideRear<font color="#339933">,</font>&nbsp;&nbsp;QuadTexture&nbsp;arrowTex<font>&#41;</font><font>&#93;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;defaultTex&nbsp;<font color="#339933">=</font>&nbsp;QuadPlainColor&nbsp;<font>&#40;</font>color3&nbsp;<font>1</font>&nbsp;<font>0</font>&nbsp;<font>0</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;boxTexSpec&nbsp;<font color="#339933">=</font>&nbsp;BoxTextureSpec&nbsp;texes&nbsp;defaultTex</blockquote>
 
 Элементы типа GraphObject строятся с помощью мнемонических функций во время создания StructureObject. Сейчас в модуле Structure.GraphObject имеются следующие функции: primitiveBox, variableBox, functionBox, foundationBox, arrowBridgeBox, equalSignBridgeBox, bridgeBox и guardFrame. Для примера приведу лишь несколько функций:
 
--- Модуль Structure.GraphObject
-primitiveBox trans dim@(GL.Vector3 l h w) texName = (trans,       dim, PrimitiveBox (vertex3 l h w) texName)
-variableBox _      dim@(GL.Vector3 l h w)         = (nullVector3, dim, PrimitiveBox (vertex3 l h w) helloTex)
-
-arrowBridgeBox     dim = bridgeBox dim arrowTex
-equalSignBridgeBox dim = bridgeBox dim equalSignTex
-
-bridgeBox dim@(GL.Vector3 l h w) texName =
-    (nullVector3, dim, TexturedBox (vertex3 l h w) boxTexSpec)
-  where
-      boxTexSpec = BoxTextureSpec texes defTex
-      texes      = [(SideTop, QuadTexture texName)]
-      defTex     = QuadTexture yellowBaseTex
+<blockquote><font color="#5d478b">--&nbsp;Модуль&nbsp;Structure.GraphObject</font><br/>
+primitiveBox&nbsp;trans&nbsp;dim<font color="#339933">@</font><font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;l&nbsp;h&nbsp;w<font>&#41;</font>&nbsp;texName&nbsp;<font color="#339933">=</font>&nbsp;<font>&#40;</font>trans<font color="#339933">,</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dim<font color="#339933">,</font>&nbsp;PrimitiveBox&nbsp;<font>&#40;</font>vertex3&nbsp;l&nbsp;h&nbsp;w<font>&#41;</font>&nbsp;texName<font>&#41;</font><br/>
+variableBox&nbsp;<font color="#339933">_</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dim<font color="#339933">@</font><font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;l&nbsp;h&nbsp;w<font>&#41;</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;<font>&#40;</font>nullVector3<font color="#339933">,</font>&nbsp;dim<font color="#339933">,</font>&nbsp;PrimitiveBox&nbsp;<font>&#40;</font>vertex3&nbsp;l&nbsp;h&nbsp;w<font>&#41;</font>&nbsp;helloTex<font>&#41;</font><br/>
+&nbsp;<br/>
+arrowBridgeBox&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dim&nbsp;<font color="#339933">=</font>&nbsp;bridgeBox&nbsp;dim&nbsp;arrowTex<br/>
+equalSignBridgeBox&nbsp;dim&nbsp;<font color="#339933">=</font>&nbsp;bridgeBox&nbsp;dim&nbsp;equalSignTex<br/>
+&nbsp;<br/>
+bridgeBox&nbsp;dim<font color="#339933">@</font><font>&#40;</font>GL<font color="#339933">.</font>Vector3&nbsp;l&nbsp;h&nbsp;w<font>&#41;</font>&nbsp;texName&nbsp;<font color="#339933">=</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>nullVector3<font color="#339933">,</font>&nbsp;dim<font color="#339933">,</font>&nbsp;TexturedBox&nbsp;<font>&#40;</font>vertex3&nbsp;l&nbsp;h&nbsp;w<font>&#41;</font>&nbsp;boxTexSpec<font>&#41;</font><br/>
+&nbsp;&nbsp;<font>where</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boxTexSpec&nbsp;<font color="#339933">=</font>&nbsp;BoxTextureSpec&nbsp;texes&nbsp;defTex<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;texes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;<font>&#91;</font><font>&#40;</font>SideTop<font color="#339933">,</font>&nbsp;QuadTexture&nbsp;texName<font>&#41;</font><font>&#93;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;defTex&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;QuadTexture&nbsp;yellowBaseTex</blockquote>
 
 ======================(эскиз do...let)=======================
 
 Отдельно стоит рассказать о системе рендеринга. На данный момент я компилирую графические примитивы в объекты сцены и сразу же их рисую. Это происходит в функции render, которая в составе функции draw вечно крутится в цикле программы. Конечно, такой код неэффективен, ведь при компиляции одного и того же StructureObject-дерева получается одна и та же сцена с объектами, и можно было бы ее подготовить загодя. Никаких препятствий тут нет, к тому же рендеринг и компиляция легко разделяются, если возвращать список действий [IO()], а не выполнять на месте, как это сделано сейчас:
 
--- Модуль Draw.Render
-render texRes (StructureObject _ (soTrans, _) goSpec objects) = do
-    GL.translate soTrans                   -- устанавливаем относительное смещение
-    mapM_ (render texRes) objects          -- рекурсивно спускаемся по дереву
-    sequence_ $ compileGraphObjectSpec texRes goSpec -- компилируем примитивы и выполняем OpenGL-вызовы
-    GL.translate . negateVector3 $ soTrans -- убираем относительное смещение
+<blockquote><font color="#5d478b">--&nbsp;Модуль&nbsp;Draw.Render</font><br/>
+render&nbsp;texRes&nbsp;<font>&#40;</font>StructureObject&nbsp;<font color="#339933">_</font>&nbsp;<font>&#40;</font>soTrans<font color="#339933">,</font>&nbsp;<font color="#339933">_</font><font>&#41;</font>&nbsp;goSpec&nbsp;objects<font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;<font>do</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>translate&nbsp;soTrans&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5d478b">--&nbsp;устанавливаем&nbsp;относительное&nbsp;смещение</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>mapM_</font>&nbsp;<font>&#40;</font>render&nbsp;texRes<font>&#41;</font>&nbsp;objects&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5d478b">--&nbsp;рекурсивно&nbsp;спускаемся&nbsp;по&nbsp;дереву</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>sequence_</font>&nbsp;<font color="#339933">$</font>&nbsp;compileGraphObjectSpec&nbsp;texRes&nbsp;goSpec&nbsp;<font color="#5d478b">--&nbsp;компилируем&nbsp;примитивы&nbsp;и&nbsp;выполняем&nbsp;OpenGL-вызовы</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>translate&nbsp;<font color="#339933">.</font>&nbsp;negateVector3&nbsp;<font color="#339933">$</font>&nbsp;soTrans&nbsp;<font color="#5d478b">--&nbsp;убираем&nbsp;относительное&nbsp;смещение</font></blockquote>
 
 Алгоритм рендеринга рекурсивен. Спускаясь по дереву от коренного StructureObject, мы выставляем все новые и новые смещения для дочерних элементов, а при возврате на предыдущий уровень эти смещения убираем. Функция compileGraphObjectSpec компилирует объект GraphObject в объект сцены. Функция sequence_ выполняет список действий [IO()]. У графических объектов тоже есть относительное смещение, поэтому делаем аналогиные переносы координат:
 
--- Модуль Structure.GOCompile
-compileGraphObjectSpec texRes (goTrans, _, go) = let
-    forwardTrans  = GL.translate goTrans
-    compiled      = compileGraphObject texRes go
-    backwardTrans = GL.translate . negateVector3 $ goTrans
-    in (forwardTrans : compiled) ++ [backwardTrans]
+<blockquote><font color="#5d478b">--&nbsp;Модуль&nbsp;Structure.GOCompile</font><br/>
+compileGraphObjectSpec&nbsp;texRes&nbsp;<font>&#40;</font>goTrans<font color="#339933">,</font>&nbsp;<font color="#339933">_,</font>&nbsp;go<font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;<font>let</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;forwardTrans&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;GL<font color="#339933">.</font>translate&nbsp;goTrans<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;compiled&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;compileGraphObject&nbsp;texRes&nbsp;go<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;backwardTrans&nbsp;<font color="#339933">=</font>&nbsp;GL<font color="#339933">.</font>translate&nbsp;<font color="#339933">.</font>&nbsp;negateVector3&nbsp;<font color="#339933">$</font>&nbsp;goTrans<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>in</font>&nbsp;<font>&#40;</font>forwardTrans&nbsp;:&nbsp;compiled<font>&#41;</font>&nbsp;<font color="#339933">++</font>&nbsp;<font>&#91;</font>backwardTrans<font>&#93;</font></blockquote>
 
 Вообще, код в модуле Structure.GOCompile весьма интересен применяемыми техниками (например, свертки и list comprehensions). Конечно, такой код труднее понять, но мне чудится в нем какая-то внутренняя красота и завершенность, ценная сама по себе:
 
--- | Collects actions for specified box side drawings.
--- | It should be used only in this module.
-f :: PreparedTextureObjects
-    -> GLfVertex3
-    -> (BoxSide, QuadColorSpec)
-    -> ([BoxSide], [IO()])
-    -> ([BoxSide], [IO()])
-f texRes boxDim (side, qColorSpec) (sList, ioList) = let
-    boxIO = do setQuadColorSpec texRes qColorSpec
-               GL.renderPrimitive GL.Quads (boxSide boxDim side)
-    in (side : sList, boxIO : ioList) 
-
--- | Compiles GraphObject into action list structure, which is ready-to-eval. ([IO ()])
-compileGraphObject :: PreparedTextureObjects -> GraphObject -> [IO()]
-
-compileGraphObject _ NoGraphObject = []
-
-compileGraphObject texRes (GraphObjects gObjectSpecs) =
-    concatMap (compileGraphObjectSpec texRes) gObjectSpecs
-
-compileGraphObject texRes (PrimitiveBox boxDim texName) =
-    [do GL.color colorWhite
-        GL.textureBinding GL.Texture2D GL.$= lookup texName texRes
-        GL.renderPrimitive GL.Quads (allBoxSides boxDim)]
-
-compileGraphObject texRes (TexturedBox boxDim boxTexSpec) = let
-    (BoxTextureSpec sideTexes defTex) = boxTexSpec
-    (textedSides, textedSideDrawList) = foldr (f texRes boxDim) ([], []) sideTexes
-    untextedSides                     = [s | s <- boxSideList, s `notElem` textedSides]
-    untextedQColor                    = setQuadColorSpec texRes defTex
-    untextedSidesDraw                 = GL.renderPrimitive GL.Quads (boxSides boxDim untextedSides)
-    in untextedQColor : untextedSidesDraw : textedSideDrawList
+<blockquote><font color="#5d478b">--&nbsp;|&nbsp;Collects&nbsp;actions&nbsp;for&nbsp;specified&nbsp;box&nbsp;side&nbsp;drawings.</font><br/>
+<font color="#5d478b">--&nbsp;|&nbsp;It&nbsp;should&nbsp;be&nbsp;used&nbsp;only&nbsp;in&nbsp;this&nbsp;module.</font><br/>
+f&nbsp;<font color="#339933">::</font>&nbsp;PreparedTextureObjects<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">-&gt;</font>&nbsp;GLfVertex3<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">-&gt;</font>&nbsp;<font>&#40;</font>BoxSide<font color="#339933">,</font>&nbsp;QuadColorSpec<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">-&gt;</font>&nbsp;<font>&#40;</font><font>&#91;</font>BoxSide<font>&#93;</font><font color="#339933">,</font>&nbsp;<font>&#91;</font><font color="#cccc00">IO</font><font>&#40;</font><font>&#41;</font><font>&#93;</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">-&gt;</font>&nbsp;<font>&#40;</font><font>&#91;</font>BoxSide<font>&#93;</font><font color="#339933">,</font>&nbsp;<font>&#91;</font><font color="#cccc00">IO</font><font>&#40;</font><font>&#41;</font><font>&#93;</font><font>&#41;</font><br/>
+f&nbsp;texRes&nbsp;boxDim&nbsp;<font>&#40;</font>side<font color="#339933">,</font>&nbsp;qColorSpec<font>&#41;</font>&nbsp;<font>&#40;</font>sList<font color="#339933">,</font>&nbsp;ioList<font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;<font>let</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;boxIO&nbsp;<font color="#339933">=</font>&nbsp;<font>do</font>&nbsp;setQuadColorSpec&nbsp;texRes&nbsp;qColorSpec<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>renderPrimitive&nbsp;GL<font color="#339933">.</font>Quads&nbsp;<font>&#40;</font>boxSide&nbsp;boxDim&nbsp;side<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>in</font>&nbsp;<font>&#40;</font>side&nbsp;:&nbsp;sList<font color="#339933">,</font>&nbsp;boxIO&nbsp;:&nbsp;ioList<font>&#41;</font>&nbsp;<br/>
+&nbsp;<br/>
+<font color="#5d478b">--&nbsp;|&nbsp;Compiles&nbsp;GraphObject&nbsp;into&nbsp;action&nbsp;list&nbsp;structure,&nbsp;which&nbsp;is&nbsp;ready-to-eval.&nbsp;([IO&nbsp;()])</font><br/>
+compileGraphObject&nbsp;<font color="#339933">::</font>&nbsp;PreparedTextureObjects&nbsp;<font color="#339933">-&gt;</font>&nbsp;GraphObject&nbsp;<font color="#339933">-&gt;</font>&nbsp;<font>&#91;</font><font color="#cccc00">IO</font><font>&#40;</font><font>&#41;</font><font>&#93;</font><br/>
+&nbsp;<br/>
+compileGraphObject&nbsp;<font color="#339933">_</font>&nbsp;NoGraphObject&nbsp;<font color="#339933">=</font>&nbsp;<font>&#91;</font><font>&#93;</font><br/>
+&nbsp;<br/>
+compileGraphObject&nbsp;texRes&nbsp;<font>&#40;</font>GraphObjects&nbsp;gObjectSpecs<font>&#41;</font>&nbsp;<font color="#339933">=</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>concatMap</font>&nbsp;<font>&#40;</font>compileGraphObjectSpec&nbsp;texRes<font>&#41;</font>&nbsp;gObjectSpecs<br/>
+&nbsp;<br/>
+compileGraphObject&nbsp;texRes&nbsp;<font>&#40;</font>PrimitiveBox&nbsp;boxDim&nbsp;texName<font>&#41;</font>&nbsp;<font color="#339933">=</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>&#91;</font><font>do</font>&nbsp;GL<font color="#339933">.</font>color&nbsp;colorWhite<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>textureBinding&nbsp;GL<font color="#339933">.</font>Texture2D&nbsp;GL<font color="#339933">.$=</font>&nbsp;<font>lookup</font>&nbsp;texName&nbsp;texRes<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>renderPrimitive&nbsp;GL<font color="#339933">.</font>Quads&nbsp;<font>&#40;</font>allBoxSides&nbsp;boxDim<font>&#41;</font><font>&#93;</font><br/>
+&nbsp;<br/>
+compileGraphObject&nbsp;texRes&nbsp;<font>&#40;</font>TexturedBox&nbsp;boxDim&nbsp;boxTexSpec<font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;<font>let</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>BoxTextureSpec&nbsp;sideTexes&nbsp;defTex<font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;boxTexSpec<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>&#40;</font>textedSides<font color="#339933">,</font>&nbsp;textedSideDrawList<font>&#41;</font>&nbsp;<font color="#339933">=</font>&nbsp;<font>foldr</font>&nbsp;<font>&#40;</font>f&nbsp;texRes&nbsp;boxDim<font>&#41;</font>&nbsp;<font>&#40;</font><font>&#91;</font><font>&#93;</font><font color="#339933">,</font>&nbsp;<font>&#91;</font><font>&#93;</font><font>&#41;</font>&nbsp;sideTexes<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;untextedSides&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;<font>&#91;</font>s&nbsp;<font color="#339933">|</font>&nbsp;s&nbsp;<font color="#339933">&lt;-</font>&nbsp;boxSideList<font color="#339933">,</font>&nbsp;s&nbsp;`<font>notElem</font>`&nbsp;textedSides<font>&#93;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;untextedQColor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;setQuadColorSpec&nbsp;texRes&nbsp;defTex<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;untextedSidesDraw&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#339933">=</font>&nbsp;GL<font color="#339933">.</font>renderPrimitive&nbsp;GL<font color="#339933">.</font>Quads&nbsp;<font>&#40;</font>boxSides&nbsp;boxDim&nbsp;untextedSides<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<font>in</font>&nbsp;untextedQColor&nbsp;:&nbsp;untextedSidesDraw&nbsp;:&nbsp;textedSideDrawList</blockquote>
 
 Коробки состоят из граней, а грани заливаются цветом или текстурой. В OpenGL какую-либо фигуру можно рисовать повершинно; в нашем случае это будут вершины четырехугольника. Вершины расчитываются из длины, высоты и ширины, содержащихся в dim, причем нулевая точка соответствует углу коробки слева-внизу-сзади (просто потому, что оси в системе координат OpenGL так направлены: OX - вправо, OY - вверх, OZ - на нас). Грани создаются в модуле Misc.BoxSide с помощью функций из библиотеки HOpenGL.
 
-boxSide :: GLfVertex3 -> BoxSide -> IO ()
-
-boxSide (GL.Vertex3 x y z) SideTop = do
-            GL.texCoord texCoordDR >> GL.vertex (vertex3 x y z)
-            GL.texCoord texCoordUR >> GL.vertex (vertex3 x y 0)
-            GL.texCoord texCoordUL >> GL.vertex (vertex3 0 y 0)
-            GL.texCoord texCoordDL >> GL.vertex (vertex3 0 y z)
-
-boxSide (GL.Vertex3 x y z) SideFront = do
-            GL.texCoord texCoordUR >> GL.vertex (vertex3 x y z)
-            GL.texCoord texCoordUL >> GL.vertex (vertex3 0 y z)
-            GL.texCoord texCoordDL >> GL.vertex (vertex3 0 0 z)
-            GL.texCoord texCoordDR >> GL.vertex (vertex3 x 0 z)
-
--- ... и так далее для всех 6 граней.
-
-boxSideList = [SideTop, SideBottom, SideLeft, SideRight, SideRear, SideFront]
-boxSides    boxDim = mapM_ (boxSide boxDim)
-allBoxSides boxDim = boxSides boxDim boxSideList
+<blockquote>boxSide&nbsp;<font color="#339933">::</font>&nbsp;GLfVertex3&nbsp;<font color="#339933">-&gt;</font>&nbsp;BoxSide&nbsp;<font color="#339933">-&gt;</font>&nbsp;<font color="#cccc00">IO</font>&nbsp;<font>&#40;</font><font>&#41;</font><br/>
+&nbsp;<br/>
+boxSide&nbsp;<font>&#40;</font>GL<font color="#339933">.</font>Vertex3&nbsp;x&nbsp;y&nbsp;z<font>&#41;</font>&nbsp;SideTop&nbsp;<font color="#339933">=</font>&nbsp;<font>do</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>texCoord&nbsp;texCoordDR&nbsp;<font color="#339933">&gt;&gt;</font>&nbsp;GL<font color="#339933">.</font>vertex&nbsp;<font>&#40;</font>vertex3&nbsp;x&nbsp;y&nbsp;z<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>texCoord&nbsp;texCoordUR&nbsp;<font color="#339933">&gt;&gt;</font>&nbsp;GL<font color="#339933">.</font>vertex&nbsp;<font>&#40;</font>vertex3&nbsp;x&nbsp;y&nbsp;<font>0</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>texCoord&nbsp;texCoordUL&nbsp;<font color="#339933">&gt;&gt;</font>&nbsp;GL<font color="#339933">.</font>vertex&nbsp;<font>&#40;</font>vertex3&nbsp;<font>0</font>&nbsp;y&nbsp;<font>0</font><font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>texCoord&nbsp;texCoordDL&nbsp;<font color="#339933">&gt;&gt;</font>&nbsp;GL<font color="#339933">.</font>vertex&nbsp;<font>&#40;</font>vertex3&nbsp;<font>0</font>&nbsp;y&nbsp;z<font>&#41;</font><br/>
+&nbsp;<br/>
+boxSide&nbsp;<font>&#40;</font>GL<font color="#339933">.</font>Vertex3&nbsp;x&nbsp;y&nbsp;z<font>&#41;</font>&nbsp;SideFront&nbsp;<font color="#339933">=</font>&nbsp;<font>do</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>texCoord&nbsp;texCoordUR&nbsp;<font color="#339933">&gt;&gt;</font>&nbsp;GL<font color="#339933">.</font>vertex&nbsp;<font>&#40;</font>vertex3&nbsp;x&nbsp;y&nbsp;z<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>texCoord&nbsp;texCoordUL&nbsp;<font color="#339933">&gt;&gt;</font>&nbsp;GL<font color="#339933">.</font>vertex&nbsp;<font>&#40;</font>vertex3&nbsp;<font>0</font>&nbsp;y&nbsp;z<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>texCoord&nbsp;texCoordDL&nbsp;<font color="#339933">&gt;&gt;</font>&nbsp;GL<font color="#339933">.</font>vertex&nbsp;<font>&#40;</font>vertex3&nbsp;<font>0</font>&nbsp;<font>0</font>&nbsp;z<font>&#41;</font><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GL<font color="#339933">.</font>texCoord&nbsp;texCoordDR&nbsp;<font color="#339933">&gt;&gt;</font>&nbsp;GL<font color="#339933">.</font>vertex&nbsp;<font>&#40;</font>vertex3&nbsp;x&nbsp;<font>0</font>&nbsp;z<font>&#41;</font><br/>
+&nbsp;<br/>
+<font color="#5d478b">--&nbsp;...&nbsp;и&nbsp;так&nbsp;далее&nbsp;для&nbsp;всех&nbsp;6&nbsp;граней.</font><br/>
+&nbsp;<br/>
+boxSideList&nbsp;<font color="#339933">=</font>&nbsp;<font>&#91;</font>SideTop<font color="#339933">,</font>&nbsp;SideBottom<font color="#339933">,</font>&nbsp;SideLeft<font color="#339933">,</font>&nbsp;SideRight<font color="#339933">,</font>&nbsp;SideRear<font color="#339933">,</font>&nbsp;SideFront<font>&#93;</font><br/>
+boxSides&nbsp;&nbsp;&nbsp;&nbsp;boxDim&nbsp;<font color="#339933">=</font>&nbsp;<font>mapM_</font>&nbsp;<font>&#40;</font>boxSide&nbsp;boxDim<font>&#41;</font><br/>
+allBoxSides&nbsp;boxDim&nbsp;<font color="#339933">=</font>&nbsp;boxSides&nbsp;boxDim&nbsp;boxSideList</blockquote>
 
 ============(какой-нибудь эскиз)======================
 
