@@ -82,9 +82,11 @@ constructGuardFrame = let
 
 constructFramedGRhs :: StructureObject -> StructureObject
 constructFramedGRhs grhsSo = let
-    guardFrameSo   = constructGuardFrame
-    preFrameBridge = constructBridge OcsArrowBridge
-    in connectStructureObjects OsFramedGrhs [preFrameBridge, guardFrameSo, grhsSo]
+    guardFrameSo    = constructGuardFrame
+    preFrameBridge  = constructBridge OcsArrowBridge
+    frameBridgeSpec = (nullTranslation, nullDimension)
+    in connectStructureObjects (OsFramedGrhs frameBridgeSpec)
+                               [preFrameBridge, guardFrameSo, grhsSo]
 
 constructGuardedRhs :: ObjectConstructSpec -> StructureObject
 constructGuardedRhs (OcsGuardedRhs (HsGuardedRhs _ boolExp exp)) = let
@@ -111,7 +113,7 @@ constructFramedGRhss (OcsGuardedRhss (HsGuardedRhss rhss)) = let
 --  for function match construction. It should be rewritten after article printed.
 
 constructGeneralConnector (OcsGeneralConnector gRhssSo) = let
-    
+    guardedRhss = gRhssSo
     
     
     in undefined

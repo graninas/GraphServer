@@ -28,7 +28,7 @@ data ObjectSpec = OsFunction
                 | OsEqualSignBridge
                 | OsGuardFrame Dimension Dimension -- outerDim, innerDim
                 | OsGuardedRhs
-                | OsFramedGrhs
+                | OsFramedGrhs (Translation, Dimension) -- Left bridge of guard frame
                 | OsFramedGrhss
     deriving (Show)
 

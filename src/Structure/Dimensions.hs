@@ -20,13 +20,12 @@ funcBoxDerivedDims (GL.Vector3 opl oph opw) (GL.Vector3 fBoxl fBoxh fBoxw) =
   where
     f  op box | op >= box       = op + 1
               | (box - op) <  1 = op + 1
-              | (box - op) >= 1 = box 
+              | (box - op) >= 1 = box
 
 -- | Calculates dims for variable box
 variableBoxDims :: GLfVector3 -> GLfVector3
 variableBoxDims (GL.Vector3 varl varh varw) =
     (GL.Vector3 (if varl < 2 then 2 else varl) varh varw)
-
 
 -- | Calculates general dimensions of the object group
 generalizedDimension :: Geometries -> Dimension
