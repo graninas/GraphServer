@@ -57,7 +57,7 @@ t5 = HsGuardedRhs (SrcLoc {srcFilename = "<unknown>", srcLine = 6, srcColumn = 9
                   (HsInfixApp (HsVar (UnQual (HsIdent "n"))) (HsQVarOp (UnQual (HsSymbol "=="))) (HsLit (HsInt 0)))
                   (HsLit (HsInt 1))
 
-t6 = HsGuardedRhss [t4, t5]
+t6 = HsGuardedRhss [t4, t5] -- Framed Grhss
 
 t7 = HsMatch (SrcLoc {srcFilename = "<unknown>", srcLine = 6, srcColumn = 1})
              (HsIdent "fact'")

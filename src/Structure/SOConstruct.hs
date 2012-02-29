@@ -84,8 +84,7 @@ constructFramedGRhs :: StructureObject -> StructureObject
 constructFramedGRhs grhsSo = let
     guardFrameSo    = constructGuardFrame
     preFrameBridge  = constructBridge OcsArrowBridge
-    frameBridgeSpec = (nullTranslation, nullDimension)
-    in connectStructureObjects (OsFramedGrhs frameBridgeSpec)
+    in connectStructureObjects (OsFramedGrhs nullDimension)
                                [preFrameBridge, guardFrameSo, grhsSo]
 
 constructGuardedRhs :: ObjectConstructSpec -> StructureObject
@@ -107,28 +106,34 @@ constructFramedGRhss :: ObjectConstructSpec -> StructureObject
 constructFramedGRhss (OcsGuardedRhss (HsGuardedRhss rhss)) = let
     guardedRhss = map (constructGuardedRhs . OcsGuardedRhs) rhss
     framedGRhss = map constructFramedGRhs guardedRhss
-    in connectStructureObjects OsFramedGrhss framedGRhss
+    objectSpec  = OsFramedGrhss nullVector3 
+    in connectStructureObjects objectSpec framedGRhss
+
 
 -- | constructMatch (and other function below) contains a special cases
 --  for function match construction. It should be rewritten after article printed.
 
-constructGeneralConnector (OcsGeneralConnector gRhssSo) = let
-    guardedRhss = gRhssSo
-    
-    
-    in undefined
-
-constructFuncMatch (OcsFuncMatch funcHsName arg) = undefined
+constructFuncMatch (OcsFuncMatch funcHsName arg) = let
+    (HsPVar hsIdent) = arg
+    funcExp = (HsVar (UnQual funcHsName))
+    argExp  = (HsVar (UnQual hsIdent))
+    in constructExp (OcsApp (HsApp funcExp argExp))
 
 constructMatch :: ObjectConstructSpec -> StructureObject
 constructMatch (OcsMatch (HsMatch _ funcHsName (arg:_) gRhss _)) = let
-    gRhssSo            = constructFramedGRhss      (OcsGuardedRhss      gRhss)
-    generalConnectorSo = constructGeneralConnector (OcsGeneralConnector gRhssSo)
+    framedGrhssSo      = constructFramedGRhss      (OcsGuardedRhss      gRhss)
+    generalConnectorSo = constructGeneralConnector (OcsGeneralConnector framedGrhssSo)
     funcMatchSo        = constructFuncMatch        (OcsFuncMatch        funcHsName arg)
-    funcFoundationSo   = constructFoundation       (OcsFoundationExp    funcMatchSo)
+    funcFoundSo        = constructFoundation       (OcsFoundationExp    funcMatchSo)
     funcBridgeSo       = constructBridge            OcsArrowBridge
-    in gRhssSo
+    objects            = [funcMatchSo, funcFoundSo, funcBridgeSo, generalConnectorSo, framedGrhssSo]
+    in connectStructureObjects OsMatch objects
 
 
+constructGeneralConnector (OcsGeneralConnector fgRhssSo) = let
+    (StructureObject (OsFramedGrhss frBridgeGenDim) _ _ _) = fgRhssSo
+    genConnectorGeom   = (nullTranslation, frBridgeGenDim)
+    genConnectorGoSpec = generalConnector frBridgeGenDim
+    in StructureObject OsGeneralConnector genConnectorGeom genConnectorGoSpec []
 
 

@@ -21,9 +21,10 @@ graphObjectFromSpec (_, _, go) = go
 nullGraphObjSpec = (nullTranslation, nullDimension, NoGraphObject)
 
 primitiveBox   trans dim@(GL.Vector3 l h w) texName = (trans, dim, PrimitiveBox (vertex3 l h w) texName)
-variableBox _  dim@(GL.Vector3 l h w) = (nullVector3, dim, PrimitiveBox (vertex3 l h w) helloTex)
-functionBox _  dim@(GL.Vector3 l h w) = (nullVector3, dim, PrimitiveBox (vertex3 l h w) helloTex)
-foundationBox  dim@(GL.Vector3 l h w) = (nullVector3, dim, PrimitiveBox (vertex3 l h w) hazardStripeTex)
+variableBox _      dim = primitiveBox nullVector3 dim helloTex
+functionBox _      dim = primitiveBox nullVector3 dim helloTex
+foundationBox      dim = primitiveBox nullVector3 dim hazardStripeTex
+generalConnector   dim = primitiveBox nullVector3 dim hazardStripeTex
 arrowBridgeBox     dim = bridgeBox dim arrowTex
 equalSignBridgeBox dim = bridgeBox dim equalSignTex
 

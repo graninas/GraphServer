@@ -28,8 +28,10 @@ data ObjectSpec = OsFunction
                 | OsEqualSignBridge
                 | OsGuardFrame Dimension Dimension -- outerDim, innerDim
                 | OsGuardedRhs
-                | OsFramedGrhs (Translation, Dimension) -- Left bridge of guard frame
-                | OsFramedGrhss
+                | OsFramedGrhs Dimension  -- Frame bridge dimension
+                | OsFramedGrhss Dimension -- All frame bridges' dimension 
+                | OsGeneralConnector
+                | OsMatch
     deriving (Show)
 
 data ObjectConstructSpec
@@ -43,10 +45,9 @@ data ObjectConstructSpec
                 | OcsArrowBridge
                 | OcsEqualSignBridge
                 | OcsMatch HsMatch
-                
+
                 -- Special for article
                 | OcsGeneralConnector StructureObject
                 | OcsFuncMatch HsName HsPat
                 
-                
-                
+               
