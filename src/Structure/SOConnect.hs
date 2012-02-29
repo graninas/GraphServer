@@ -100,10 +100,11 @@ connectStructureObjects OsMatch
     connDim  @(GL.Vector3 cl   ch   cw)   = geometryDim . soGeometry $ genConnectorSo
     fgrhssDim@(GL.Vector3 fgrl fgrh fgrw) = geometryDim . soGeometry $ framedGrhssSo
 
-    bridgeTrans   = vector3  fl            (fh   - fmfh) ((bw - fw)   / 2)
-    genConnTrans  = vector3 (fl + bl)      (ch   - fmfh) ((cw - bw)   / 2)
-    fgrhssTrans   = vector3 (fl + bl + cl) (fgrh - fmfh) ((fgrw - cw) / 2)
+    bridgeTrans   = vector3  fl            0 ((fmfw - bw) / 2) --(fmfh - fh)   ((bw - fw)   / 2)
+    genConnTrans  = vector3 (fl + bl)      0 0 --(fmfh - ch)   ((bw - cw)   / 2)
+    fgrhssTrans   = vector3 (fl + bl + cl) 0 0 --(fmfh - fgrh) ((cw - fgrw) / 2)
 
+   -- newFmfSo      = funcMatchFoundSo {soGeometry = (nullVector3,  fmfDim)}
     newBridgeSo   = fBridgeSo      {soGeometry = (bridgeTrans,  bridgeDim)}
     newConnSo     = genConnectorSo {soGeometry = (genConnTrans, connDim)}
     newFGrhssSo   = framedGrhssSo  {soGeometry = (fgrhssTrans,  fgrhssDim)}
