@@ -17,9 +17,9 @@ draw ress@(GLResources texRes) n = do
     putStr $ "Current n = " ++ show n
     GL.clear [GL.ColorBuffer, GL.DepthBuffer]
     GL.loadIdentity
-    GL.rotate 10 (vector3 0 1 0)
+    GL.translate (vector3 (-10) (-0) (-20))
+    GL.rotate 50 (vector3 0 1 0)
     GL.rotate 20 (vector3 1 0 0)
-    GL.translate (vector3 (-5) (-10) (-30))
     --test ress
 
 

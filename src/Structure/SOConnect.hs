@@ -104,7 +104,6 @@ connectStructureObjects OsMatch
     genConnTrans  = vector3 (fl + bl)      0 0 --(fmfh - ch)   ((bw - cw)   / 2)
     fgrhssTrans   = vector3 (fl + bl + cl) 0 0 --(fmfh - fgrh) ((cw - fgrw) / 2)
 
-   -- newFmfSo      = funcMatchFoundSo {soGeometry = (nullVector3,  fmfDim)}
     newBridgeSo   = fBridgeSo      {soGeometry = (bridgeTrans,  bridgeDim)}
     newConnSo     = genConnectorSo {soGeometry = (genConnTrans, connDim)}
     newFGrhssSo   = framedGrhssSo  {soGeometry = (fgrhssTrans,  fgrhssDim)}
